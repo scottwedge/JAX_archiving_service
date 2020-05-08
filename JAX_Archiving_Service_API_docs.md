@@ -13,7 +13,13 @@
 - archive_processing
 - /archive_submitted
 - /archive_success
+- /retrieve_failed
+- /retrieve_processing
+- /retrieve_submitted
+- /retrieve_success
 
+
+<a href="htps://www.google.com">Some Link</a>
 
 Dillinger is a cloud-enabled, mobile-ready, offline-storage, AngularJS powered HTML5 Markdown editor.
 
@@ -155,6 +161,8 @@ See [KUBERNETES.md](https://github.com/joemccann/dillinger/blob/master/KUBERNETE
 
 
 ### Todos
+
+<span id="archive">/archive</span>
 
  - Write MORE Tests
  - Add Night Mode
