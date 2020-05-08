@@ -32,10 +32,10 @@ The body of the `POST` request must contain the following keys [`api_key`, `meta
 - `source_folder`
 -- String representing the absolute path to the directory requested to be archived
 - `service_path`
--- Not applicable for requests to archive `faculty` data
--- Applicable for any of the services. Presently there are only two services archiving data (single cell & microscopy)
---The user specified path in the archive after `/archive/services/<singlecell or microscopy>/`
--- The service will generate the correct prefix with the appropriate service name `singlecell` or `microscopy`
+   - Not applicable for requests to archive `faculty` data
+   - Applicable for any of the services. Presently there are only two services archiving data (single cell & microscopy)
+   - The user specified path in the archive after `/archive/services/<singlecell or microscopy>/`
+   - The service will generate the correct prefix with the appropriate service name `singlecell` or `microscopy`
 
 ##### `metadata`
 A dictionary with the following required keys [`manager_user_id`, `user_id`, `project_name`, `grant_id`, `notes`, `system_groups`, `request_type`]
