@@ -139,6 +139,8 @@ print(response.json())
 ```
 ---
 ### /get_collection
+[back to top][endpoints]
+
 This endpoint will accept a `GET` request as described below. The successful return will be a mongoDB collection of documents. This endpoint is primarily to be used by the [archive frontend][frontend].
 
 This `GET` will include two args `api_key` and `gold`
