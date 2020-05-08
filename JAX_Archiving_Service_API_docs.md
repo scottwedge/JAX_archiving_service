@@ -6,7 +6,7 @@
 
 ## Endpoints
 
-- /archive
+- <a href="#archive">/archive</a>
 - /retrieve
 - /get_collection
 - /archive_failed
