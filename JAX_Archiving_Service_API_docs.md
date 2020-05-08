@@ -86,7 +86,7 @@ print(response.text.encode('utf8'))
 print(response.json())
 ```
 ---
-# /retrieve
+### /retrieve
 This endpoint will accept a valid `POST` retrieve request as described below. The successful return will be an integer corresponding to the number of directories submitted for retrieval.
 
 An unsuccessful return value will be a string (starting with `ERROR:`) describing why the request was not submitted to pbs.
@@ -182,7 +182,7 @@ print(response.json())
    [PlGa]: <https://github.com/RahulHP/dillinger/blob/master/plugins/googleanalytics/README.md>
 
 [1]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive
-[2]: https://www.google.com
+[2]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve
 [3]: https://www.google.com
 [4]: https://www.google.com
 [5]: https://www.google.com
