@@ -10,7 +10,7 @@
 - [`/retrieve`][2]
 - [`/get_collection`][3]
 - [`/archive_failed`][4]
-- [`archive_processing`][5]
+- [`/archive_processing`][5]
 - [`/archive_submitted`][6]
 - [`/archive_success`][7]
 - [`/retrieve_failed`][8]
