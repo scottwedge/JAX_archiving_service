@@ -47,10 +47,43 @@ A dictionary with the following required keys [`manager_user_id`, `user_id`, `pr
 -   *** `system_groups`*** A list in the form of an array of the HPC group(s) that will own the data and/or have permission to access the data on the cluster.
 -   `request_type` A string corresponding to the type of data requesting to be archived [`faculty`, `GT`, `singlecell`, `microscopy`].
 
+#### Example request
+
+```
+import requests
+
+url = "https://ctdataservices-prod01lp/api/archiving/archive"
+
+payload = "{
+    "api_key": "KEY",
+    "metadata": {
+        "manager_user_id": "piusername",
+        "user_id": "username",
+        "project_name": "example_project",
+        "grant_id": "",
+        "notes": "This is a sample notes entry",
+        "system_groups": [
+            "jaxuser",
+            "researchit"
+        ],
+        "request_type": "singlecell"
+    },
+    "source_folder": "/projects/researchit/nanozoomer_stage",
+    "service_path": "some/path/user/wants"
+}"
+headers = {'Content-Type': 'application/json'}
+
+response = requests.request("POST", url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+```
 
 
 
-
+---
+---
+---
 
 #### Example article excerpt
 
