@@ -137,6 +137,31 @@ response = requests.request("POST", url, headers=headers, data=payload, verify=F
 print(response.text.encode('utf8'))
 print(response.json())
 ```
+---
+### /get_collection
+This endpoint will accept a `GET` request as described below. The successful return will be a mongoDB collection of documents. This endpoint is primarily to be used by the [archive frontend][frontend].
+
+This `GET` will include two args `api_key` and `gold`
+- `api_key`
+   - Value is the string representing the key
+- `gold`
+   - boolean, `true` for permanently archived metadata, `false` for operational metadata
+
+#### example of `GET` request
+```
+import requests
+
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/get_collection?api_key=KEY&gold=true"
+
+payload = {}
+headers= {}
+
+response = requests.request("GET", url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+```
+
 
 ---
 ---
@@ -190,7 +215,7 @@ print(response.json())
 
 [1]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive
 [2]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve
-[3]: https://www.google.com
+[3]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#get_collection
 [4]: https://www.google.com
 [5]: https://www.google.com
 [6]: https://www.google.com
@@ -199,5 +224,6 @@ print(response.json())
 [9]: https://www.google.com
 [10]: https://www.google.com
 [11]: https://www.google.com
+[frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
 [endpoints]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints
 [metadata_link]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#metadata
