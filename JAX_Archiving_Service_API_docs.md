@@ -7,6 +7,7 @@
 ## Endpoints
 
 - [`/archive`][1]
+   - [metadata][metadata_link]
 - [`/retrieve`][2]
 - [`/get_collection`][3]
 - [`/archive_failed`][4]
@@ -40,6 +41,8 @@ The body of the `POST` request must contain the following keys [`api_key`, `meta
    - The service will generate the correct prefix with the appropriate service name `singlecell` or `microscopy`
 
 ##### `metadata`
+[back to /archive][1]
+
 A dictionary with the following required keys [`manager_user_id`, `user_id`, `project_name`, `grant_id`, `notes`, `system_groups`, `request_type`]
 -   `manager_user_id` The short username of the principal investigator (PI) owning the data.
 -   `user_id` The short username of the person who generated the data. In many cases this is a postdoc. It can be the PI. 
