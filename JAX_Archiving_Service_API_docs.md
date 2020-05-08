@@ -20,6 +20,7 @@
 
 ---
 ### /archive
+[back to top][endpoints]
 This endpoint will accept a valid `POST` archiving request as described below. The successful return for this endpoint is the object id of the metadata in mongoDB. A successful return means your request was successfully submitted to pbs and further updates on the status of the archiving event will be directed by pbs via this archiving microservice.
 
 An unsuccessful return value will be a string (starting with `ERROR:`) describing why the request was not submitted to pbs.
@@ -87,6 +88,7 @@ print(response.json())
 ```
 ---
 ### /retrieve
+[back to top][endpoints]
 This endpoint will accept a valid `POST` retrieve request as described below. The successful return will be an integer corresponding to the number of directories submitted for retrieval.
 
 An unsuccessful return value will be a string (starting with `ERROR:`) describing why the request was not submitted to pbs.
@@ -192,4 +194,5 @@ print(response.json())
 [9]: https://www.google.com
 [10]: https://www.google.com
 [11]: https://www.google.com
+[endpoints]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints
 [metadata_link]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#metadata
