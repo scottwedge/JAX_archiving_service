@@ -6,20 +6,59 @@
 
 ## Endpoints
 
-- <a href="#archive">/archive</a>
-- /retrieve
-- /get_collection
-- /archive_failed
-- archive_processing
-- /archive_submitted
-- /archive_success
-- /retrieve_failed
-- /retrieve_processing
-- /retrieve_submitted
-- /retrieve_success
+- [`/archive`][1]
+- [`/retrieve`][2]
+- [`/get_collection`][3]
+- [`/archive_failed`][4]
+- [`archive_processing`][5]
+- [`/archive_submitted`][6]
+- [`/archive_success`][7]
+- [`/retrieve_failed`][8]
+- [`/retrieve_processing`][9]
+- [`/retrieve_submitted`][10]
+- [`/retrieve_success`][11]
 
+[1]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#installation
+[2]: https://www.google.com
+[3]: https://www.google.com
+[4]: https://www.google.com
+[5]: https://www.google.com
+[6]: https://www.google.com
+[7]: https://www.google.com
+[8]: https://www.google.com
+[9]: https://www.google.com
+[10]: https://www.google.com
+[11]: https://www.google.com
 ---
-### <span id="archive">/archive</span>
+### /archive
+This endpoint will accept a valid `POST` archiving request as described below. The successful return for this endpoint is the object id of the metadata in mongoDB. A successful return means your request was successfully submitted to pbs and further updates on the status of the archiving event will be directed by pbs via this archiving microservice.
+
+An unsuccessful return value will be a string (starting with `ERROR:`) describing why the request was not submitted to pbs.
+
+The body of the `POST` request must contain the following keys [`api_key`, `metadata`, `source_folder`, `service_path`]
+- `api_key`
+-- Value is the string representing the key
+- `metadata`
+-- Value is a dictionary containing some required keys. Described in more detail below.
+- `source_folder`
+-- String representing the absolute path to the directory requested to be archived
+- `service_path`
+-- Not applicable for requests to archive `faculty` data
+-- Applicable for any of the services. Presently there are only two services archiving data (single cell & microscopy)
+--The user specified path in the archive after `/archive/services/<singlecell or microscopy>/`
+-- The service will generate the correct prefix with the appropriate service name `singlecell` or `microscopy`
+
+##### `metadata`
+A dictionary with the following required keys [`manager_user_id`, `user_id`, `project_name`, `grant_id`, `notes`, `system_groups`, `request_type`]
+-   `manager_user_id` The username of the principal investigator owning the data.
+-   `user_id` The username of person submitting the request.
+-   `project_name` The name of the project associated with the data.
+-   `grant_id` The ID of the funding grant for the data.
+-   `notes` Any additional notes that may be useful for finding this data at a later time.
+-   `system_groups` A list in the form of an array of the HPC group(s) that will own the data on the cluster.
+-   `request_type` A string that is either `faculty`, `GT`, `singlecell` or `microscopy`.
+
+
 
 Dillinger is a cloud-enabled, mobile-ready, offline-storage, AngularJS powered HTML5 Markdown editor.
 
