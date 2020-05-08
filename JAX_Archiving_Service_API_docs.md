@@ -26,11 +26,11 @@ An unsuccessful return value will be a string (starting with `ERROR:`) describin
 
 The body of the `POST` request must contain the following keys [`api_key`, `metadata`, `source_folder`, `service_path`]
 - `api_key`
--- Value is the string representing the key
+   - Value is the string representing the key
 - `metadata`
--- Value is a dictionary containing some required keys. Described in more detail below [click here][metadata_link].
+   - Value is a dictionary containing some required keys. Described in more detail below [click here][metadata_link].
 - `source_folder`
--- String representing the absolute path to the directory requested to be archived
+   - String representing the absolute path to the directory requested to be archived
 - `service_path`
    - Not applicable for requests to archive `faculty` data
    - Applicable for any of the services. Presently there are only two services archiving data (single cell & microscopy)
@@ -47,8 +47,15 @@ A dictionary with the following required keys [`manager_user_id`, `user_id`, `pr
 -   *** `system_groups`*** A list in the form of an array of the HPC group(s) that will own the data and/or have permission to access the data on the cluster.
 -   `request_type` A string corresponding to the type of data requesting to be archived [`faculty`, `GT`, `singlecell`, `microscopy`].
 
-#### Example request
+##### Flow of actions
+1. object_id of mongoDB document is returned as a string
+2. After request is submitted to pbs, metadata is updated with `job_id`, user receives an email notification about request being submitted to the queue.
+3. When pbs starts to process the job it will use the `archive_processing` endpoint with the `job_id`. 
+   - This will notify user and update metadata.
+4. When the job is completed, pbs will use the `archive_success` endpoint with `job_id`, `sourceSize` and `archivedSize`
+   - This will notify user and update metadata.
 
+#### Example `archive` request
 ```
 import requests
 
@@ -78,8 +85,51 @@ response = requests.request("POST", url, headers=headers, data=payload, verify=F
 print(response.text.encode('utf8'))
 print(response.json())
 ```
+---
+# /retrieve
+This endpoint will accept a valid `POST` retrieve request as described below. The successful return will be an integer corresponding to the number of directories submitted for retrieval.
 
+An unsuccessful return value will be a string (starting with `ERROR:`) describing why the request was not submitted to pbs.
 
+The body of the `POST` will contain the following keys [`api_key`, `requested_dirs`]
+
+- `api_key`
+   - Value is the string representing the key
+- `requested_dirs`
+   - Value is a list where each item in the list is a string representation of the `object_id` for the metadata document associated with the archived directory requesting to be retrieved.
+
+##### Flow of retrieve actions
+1. integer value corresponding to the number of directories submitted for retrieval is returned.
+2. After request is submitted to pbs, metadata is updated with `job_id`, user receives an email notification about request being submitted to the queue.
+3. When pbs starts to process the retrieve job it will use the `retrieve_processing` endpoint with the `job_id`. 
+   - This will notify user and update metadata.
+4. When the retrieve job is completed, pbs will use the `retrieve_success` endpoint with `job_id`.
+   - This will notify user and update metadata.
+
+#### Example `retrieve` request
+```
+import requests
+
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/retrieve"
+
+payload = "{
+			"api_key":"KEY",
+			"requested_dirs":[
+								"obj_id_1",
+								"obj_id_2",
+								"obj_id_3"
+							]
+			}"
+headers = {
+		'Content-Type': 'application/json',
+		'Content-Type': 'text/plain'
+}
+
+response = requests.request("POST", url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+```
 
 ---
 ---
