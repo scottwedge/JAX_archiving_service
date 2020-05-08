@@ -28,7 +28,7 @@ The body of the `POST` request must contain the following keys [`api_key`, `meta
 - `api_key`
 -- Value is the string representing the key
 - `metadata`
--- Value is a dictionary containing some required keys. Described in more detail below.
+-- Value is a dictionary containing some required keys. Described in more detail below [click here][metadata_link].
 - `source_folder`
 -- String representing the absolute path to the directory requested to be archived
 - `service_path`
@@ -142,3 +142,4 @@ print(response.json())
 [9]: https://www.google.com
 [10]: https://www.google.com
 [11]: https://www.google.com
+[metadata_link]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#metadata
