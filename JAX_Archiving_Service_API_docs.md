@@ -3,7 +3,6 @@
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta charset="utf-8">
-<title></title>
 <meta name="description" content="">
 <meta name="author" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -396,7 +395,6 @@ print(response.json())
 
 
 <!-- SCRIPTS -->
-<!-- Example: <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> -->
 <script src="zenscroll-latest/zenscroll-min.js"></script>
 </body>
 </html>
