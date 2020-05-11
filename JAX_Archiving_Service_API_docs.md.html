@@ -1,0 +1,414 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>JAX_Archiving_Service_API_docs.md</title><style></style></head><body id="preview">
+<h1 class="code-line" data-line-start=0 data-line-end=1><a id="JAX_Archiving_Service_0"></a>JAX Archiving Service</h1>
+<p class="has-line-data" data-line-start="2" data-line-end="3"><a href="https://jacksonlaboratory.sharepoint.com/sites/ResearchIT"><img src="https://clic-ctsa.org/sites/default/files/styles/large/public/2019-10/jacksonLabLogo.png" alt="N|Solid"></a></p>
+<h1 class="code-line" data-line-start=4 data-line-end=5><a id="API_Documentation_4"></a>API Documentation</h1>
+<h2 class="code-line" data-line-start=6 data-line-end=7><a id="Endpoints_6"></a>Endpoints</h2>
+<ul>
+<li class="has-line-data" data-line-start="8" data-line-end="10"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive"><code>/archive</code></a>
+<ul>
+<li class="has-line-data" data-line-start="9" data-line-end="10"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#metadata">metadata</a></li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="10" data-line-end="11"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve"><code>/retrieve</code></a></li>
+<li class="has-line-data" data-line-start="11" data-line-end="12"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#get_collection"><code>/get_collection</code></a></li>
+<li class="has-line-data" data-line-start="12" data-line-end="13"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_failed"><code>/archive_failed</code></a></li>
+<li class="has-line-data" data-line-start="13" data-line-end="14"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_processing"><code>/archive_processing</code></a></li>
+<li class="has-line-data" data-line-start="14" data-line-end="15"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_success"><code>/archive_success</code></a></li>
+<li class="has-line-data" data-line-start="15" data-line-end="16"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve_failed"><code>/retrieve_failed</code></a></li>
+<li class="has-line-data" data-line-start="16" data-line-end="17"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve_processing"><code>/retrieve_processing</code></a></li>
+<li class="has-line-data" data-line-start="17" data-line-end="19"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve_success"><code>/retrieve_success</code></a></li>
+</ul>
+<hr>
+<h3 class="code-line" data-line-start=20 data-line-end=21><a id="archive_20"></a>/archive</h3>
+<p class="has-line-data" data-line-start="21" data-line-end="22"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints">back to top</a></p>
+<p class="has-line-data" data-line-start="23" data-line-end="24">This endpoint will be used by the <a href="https://github.com/TheJacksonLaboratory/archive-frontend">archive frontend</a> or programatically by users with an <code>api_key</code> in order to deposit files into the archive (tier 3) and store metadata. This endpoint will accept a valid <code>POST</code> archiving request as described below. The successful return for this endpoint is the object id of the metadata in mongoDB. A successful return means your request was successfully submitted to pbs and further updates on the status (to the user, data services team or metadata document) of the archiving event will be directed by pbs via this archiving microservice using other endpoints.</p>
+<p class="has-line-data" data-line-start="25" data-line-end="26">An unsuccessful return value will be a string (starting with <code>ERROR:</code>) describing why the request was not submitted to pbs.</p>
+<p class="has-line-data" data-line-start="27" data-line-end="28">The body of the <code>POST</code> request must contain the following keys [<code>api_key</code>, <code>metadata</code>, <code>source_folder</code>, <code>service_path</code>]</p>
+<ul>
+<li class="has-line-data" data-line-start="28" data-line-end="30"><code>api_key</code>
+<ul>
+<li class="has-line-data" data-line-start="29" data-line-end="30">Value is the string representing the key</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="30" data-line-end="32"><code>metadata</code>
+<ul>
+<li class="has-line-data" data-line-start="31" data-line-end="32">Value is a dictionary (in python or equivalent in other language) containing some required keys. Described in more detail below <a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#metadata">click here</a>.</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="32" data-line-end="34"><code>source_folder</code>
+<ul>
+<li class="has-line-data" data-line-start="33" data-line-end="34">String representing the absolute path to the directory requested to be archived</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="34" data-line-end="40"><code>service_path</code>
+<ul>
+<li class="has-line-data" data-line-start="35" data-line-end="36">Not applicable for requests to archive <code>faculty</code> data</li>
+<li class="has-line-data" data-line-start="36" data-line-end="37">Applicable for any of the services. Presently there are only two services archiving data (single cell &amp; microscopy)</li>
+<li class="has-line-data" data-line-start="37" data-line-end="38">The user specified path in the archive after <code>/archive/services/&lt;singlecell or microscopy&gt;/</code></li>
+<li class="has-line-data" data-line-start="38" data-line-end="40">The service will generate the correct prefix with the appropriate service name <code>singlecell</code> or <code>microscopy</code></li>
+</ul>
+</li>
+</ul>
+<h5 class="code-line" data-line-start=40 data-line-end=41><a id="metadata_40"></a><code>metadata</code></h5>
+<p class="has-line-data" data-line-start="41" data-line-end="42"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive">back to /archive</a></p>
+<p class="has-line-data" data-line-start="43" data-line-end="44">A dictionary (in python or equivalent in other language) with the following required keys [<code>manager_user_id</code>, <code>user_id</code>, <code>project_name</code>, <code>grant_id</code>, <code>notes</code>, <code>system_groups</code>, <code>request_type</code>]</p>
+<ul>
+<li class="has-line-data" data-line-start="44" data-line-end="45"><code>manager_user_id</code> The short username of the principal investigator (PI) owning the data.</li>
+<li class="has-line-data" data-line-start="45" data-line-end="46"><code>user_id</code> The short username of the person who generated the data. In many cases this is a postdoc. It can be the PI.</li>
+<li class="has-line-data" data-line-start="46" data-line-end="47"><code>project_name</code> The name of the project the user specifies that the data is associated with.</li>
+<li class="has-line-data" data-line-start="47" data-line-end="48"><code>grant_id</code> The grant ID associated with the data. If there is no grant ID, set this to the empty string. The service will recognize the empty string and enter “None_entered_by_user” into mongoDB.</li>
+<li class="has-line-data" data-line-start="48" data-line-end="49"><code>notes</code> Any string the user might find useful for locating these archived files at a later date.</li>
+<li class="has-line-data" data-line-start="49" data-line-end="50">*** <code>system_groups</code>*** A list in the form of an array of the HPC group(s) that will own the data and/or have permission to access the data on the cluster.</li>
+<li class="has-line-data" data-line-start="50" data-line-end="52"><code>request_type</code> A string corresponding to the type of data requesting to be archived [<code>faculty</code>, <code>GT</code>, <code>singlecell</code>, <code>microscopy</code>].</li>
+</ul>
+<h5 class="code-line" data-line-start=52 data-line-end=53><a id="Flow_of_actions_52"></a>Flow of actions</h5>
+<ol>
+<li class="has-line-data" data-line-start="53" data-line-end="54">object_id of mongoDB document is returned as a string</li>
+<li class="has-line-data" data-line-start="54" data-line-end="55">After request is submitted to pbs, metadata is updated with <code>job_id</code>, user receives an email notification about request being submitted to the queue.</li>
+<li class="has-line-data" data-line-start="55" data-line-end="57">When pbs starts to process the job it will use the <a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_processing"><code>/archive_processing</code></a> endpoint with the <code>job_id</code>.
+<ul>
+<li class="has-line-data" data-line-start="56" data-line-end="57">This will notify user and update metadata.</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="57" data-line-end="60">When the job is completed, pbs will use the <a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_success"><code>/archive_success</code></a> endpoint with <code>job_id</code>, <code>sourceSize</code> and <code>archivedSize</code>
+<ul>
+<li class="has-line-data" data-line-start="58" data-line-end="60">This will notify user and update metadata.</li>
+</ul>
+</li>
+</ol>
+<h4 class="code-line" data-line-start=60 data-line-end=61><a id="Example_POST_request_in_python_60"></a>Example <code>POST</code> request in python</h4>
+<pre><code class="has-line-data" data-line-start="62" data-line-end="90">import requests
+
+url = &quot;https://ctdataservices-prod01lp/api/archiving/archive&quot;
+
+payload = &quot;{
+    &quot;api_key&quot;: &quot;KEY&quot;,
+    &quot;metadata&quot;: {
+        &quot;manager_user_id&quot;: &quot;piusername&quot;,
+        &quot;user_id&quot;: &quot;username&quot;,
+        &quot;project_name&quot;: &quot;example_project&quot;,
+        &quot;grant_id&quot;: &quot;&quot;,
+        &quot;notes&quot;: &quot;This is a sample notes entry&quot;,
+        &quot;system_groups&quot;: [
+            &quot;jaxuser&quot;,
+            &quot;researchit&quot;
+        ],
+        &quot;request_type&quot;: &quot;singlecell&quot;
+    },
+    &quot;source_folder&quot;: &quot;/projects/researchit/nanozoomer_stage&quot;,
+    &quot;service_path&quot;: &quot;some/path/user/wants&quot;
+}&quot;
+headers = {'Content-Type': 'application/json'}
+
+response = requests.request(&quot;POST&quot;, url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+</code></pre>
+<hr>
+<h3 class="code-line" data-line-start=91 data-line-end=92><a id="retrieve_91"></a>/retrieve</h3>
+<p class="has-line-data" data-line-start="92" data-line-end="93"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints">back to top</a></p>
+<p class="has-line-data" data-line-start="94" data-line-end="95">This endpoint will be used by the <a href="https://github.com/TheJacksonLaboratory/archive-frontend">archive frontend</a> or programatically by users with an <code>api_key</code> in order to retrieve archived (tier 3) files. This endpoint will accept a valid <code>POST</code> retrieve request as described below. The successful return will be an integer corresponding to the number of directories submitted for retrieval.</p>
+<p class="has-line-data" data-line-start="96" data-line-end="97">An unsuccessful return value will be a string (starting with <code>ERROR:</code>) describing why the request was not submitted to pbs.</p>
+<p class="has-line-data" data-line-start="98" data-line-end="99">The body of the <code>POST</code> will contain the following keys [<code>api_key</code>, <code>requested_dirs</code>]</p>
+<ul>
+<li class="has-line-data" data-line-start="100" data-line-end="102"><code>api_key</code>
+<ul>
+<li class="has-line-data" data-line-start="101" data-line-end="102">Value is the string representing the key</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="102" data-line-end="105"><code>requested_dirs</code>
+<ul>
+<li class="has-line-data" data-line-start="103" data-line-end="105">Value is a list where each item in the list is a string representation of the <code>object_id</code> for the metadata document associated with the archived directory requesting to be retrieved.</li>
+</ul>
+</li>
+</ul>
+<h5 class="code-line" data-line-start=105 data-line-end=106><a id="Flow_of_retrieve_actions_105"></a>Flow of retrieve actions</h5>
+<ol>
+<li class="has-line-data" data-line-start="106" data-line-end="107">integer value corresponding to the number of directories submitted for retrieval is returned.</li>
+<li class="has-line-data" data-line-start="107" data-line-end="108">After request is submitted to pbs, metadata is updated with <code>job_id</code>, user receives an email notification about request being submitted to the queue.</li>
+<li class="has-line-data" data-line-start="108" data-line-end="110">When pbs starts to process the retrieve job it will use the <code>retrieve_processing</code> endpoint with the <code>job_id</code>.
+<ul>
+<li class="has-line-data" data-line-start="109" data-line-end="110">This will notify user and update metadata.</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="110" data-line-end="113">When the retrieve job is completed, pbs will use the <code>retrieve_success</code> endpoint with <code>job_id</code>.
+<ul>
+<li class="has-line-data" data-line-start="111" data-line-end="113">This will notify user and update metadata.</li>
+</ul>
+</li>
+</ol>
+<h4 class="code-line" data-line-start=113 data-line-end=114><a id="Example_POST_request_in_python_113"></a>Example <code>POST</code> request in python</h4>
+<pre><code class="has-line-data" data-line-start="115" data-line-end="135">import requests
+
+url = &quot;https://ctdataservices-prod01lp.jax.org/api/archiving/retrieve&quot;
+
+payload = &quot;{
+        &quot;api_key&quot;:&quot;KEY&quot;,
+        &quot;requested_dirs&quot;:[
+                &quot;obj_id_1&quot;,
+                &quot;obj_id_2&quot;,
+                &quot;obj_id_3&quot;
+                ]
+    }&quot;
+
+headers = {'Content-Type': 'application/json'}
+
+response = requests.request(&quot;POST&quot;, url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+</code></pre>
+<hr>
+<h3 class="code-line" data-line-start=136 data-line-end=137><a id="get_collection_136"></a>/get_collection</h3>
+<p class="has-line-data" data-line-start="137" data-line-end="139">(<strong><em>To Be Redesigned</em></strong>)<br>
+<a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints">back to top</a></p>
+<p class="has-line-data" data-line-start="140" data-line-end="141">This endpoint will accept a <code>GET</code> request as described below. The successful return will be a mongoDB collection of documents. This endpoint is primarily to be used by the <a href="https://github.com/TheJacksonLaboratory/archive-frontend">archive frontend</a>.</p>
+<p class="has-line-data" data-line-start="142" data-line-end="143">This <code>GET</code> will include two args <code>api_key</code> and <code>gold</code></p>
+<ul>
+<li class="has-line-data" data-line-start="143" data-line-end="145"><code>api_key</code>
+<ul>
+<li class="has-line-data" data-line-start="144" data-line-end="145">Value is the string representing the key</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="145" data-line-end="148"><code>gold</code>
+<ul>
+<li class="has-line-data" data-line-start="146" data-line-end="148">boolean, <code>true</code> for permanently archived metadata, <code>false</code> for operational metadata</li>
+</ul>
+</li>
+</ul>
+<h4 class="code-line" data-line-start=148 data-line-end=149><a id="example_of_GET_request_in_python_148"></a>example of <code>GET</code> request in python</h4>
+<pre><code class="has-line-data" data-line-start="150" data-line-end="162">import requests
+
+url = &quot;https://ctdataservices-prod01lp.jax.org/api/archiving/get_collection?api_key=KEY&amp;gold=true&quot;
+
+payload = {}
+headers= {}
+
+response = requests.request(&quot;GET&quot;, url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+</code></pre>
+<hr>
+<h3 class="code-line" data-line-start=163 data-line-end=164><a id="archive_failed_163"></a>/archive_failed</h3>
+<p class="has-line-data" data-line-start="164" data-line-end="165"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints">back to top</a></p>
+<p class="has-line-data" data-line-start="166" data-line-end="167">This endpoint will accept a <code>GET</code> request as described below. This endpoint is used by internal components only to update the metadata with the the current status of <code>failed</code> and notify the data services team of the error.</p>
+<p class="has-line-data" data-line-start="168" data-line-end="169">The successful return will be a string with the error message generated by pbs along with the <code>job_id</code>. The metadata document associated with the <code>job_id</code> will be updated. The keys to update are <code>archival_status</code> and <code>when_archival_failed</code> with <code>&quot;failed&quot;</code> and <code>{timestamp}</code> respectively. The data services team will be sent an email notification about the failed job.</p>
+<p class="has-line-data" data-line-start="170" data-line-end="171">The unsuccessful return of this endpoint will be a string (starting with <code>ERROR:</code>) describing why the workflow of this endpoint did not fully complete successfully.</p>
+<p class="has-line-data" data-line-start="172" data-line-end="173">This <code>GET</code> will include two args, <code>api_key</code> and <code>job_id</code>.</p>
+<ul>
+<li class="has-line-data" data-line-start="174" data-line-end="176"><code>api_key</code>
+<ul>
+<li class="has-line-data" data-line-start="175" data-line-end="176">Value is a string representing the key</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="176" data-line-end="179"><code>job_id</code>
+<ul>
+<li class="has-line-data" data-line-start="177" data-line-end="179">Value is a string representing the <code>job_id</code> of the failed job.</li>
+</ul>
+</li>
+</ul>
+<h4 class="code-line" data-line-start=179 data-line-end=180><a id="Example_GET_request_in_python_179"></a>Example <code>GET</code> request in python</h4>
+<pre><code class="has-line-data" data-line-start="181" data-line-end="193">import requests
+
+url = &quot;https://ctdataservices-prod01lp.jax.org/api/archiving/archive_failed?api_key=KEY&amp;job_id=JOB_ID&quot;
+
+payload = {}
+headers= {}
+
+response = requests.request(&quot;GET&quot;, url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+</code></pre>
+<hr>
+<h3 class="code-line" data-line-start=194 data-line-end=195><a id="archive_processing_194"></a>/archive_processing</h3>
+<p class="has-line-data" data-line-start="195" data-line-end="196"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints">back to top</a></p>
+<p class="has-line-data" data-line-start="197" data-line-end="198">This endpoint will accept a <code>GET</code> request as described below. This endpoint is used by internal components only to update the metadata with the the current status of <code>processing</code>.</p>
+<p class="has-line-data" data-line-start="199" data-line-end="200">The successful return will be the <code>job_id</code>. The metadata document associated with the <code>job_id</code> will be updated. The keys to update are <code>archival_status</code> and <code>when_archival_started</code> with <code>&quot;processing&quot;</code> and <code>{timestamp}</code> respectively. The data services team will be sent an email notification about the failed job.</p>
+<p class="has-line-data" data-line-start="201" data-line-end="202">The unsuccessful return of this endpoint will be a string (starting with <code>ERROR:</code>) describing why the workflow of this endpoint did not fully complete successfully.</p>
+<p class="has-line-data" data-line-start="203" data-line-end="204">This <code>GET</code> will include two args, <code>api_key</code> and <code>job_id</code>.</p>
+<ul>
+<li class="has-line-data" data-line-start="205" data-line-end="207"><code>api_key</code>
+<ul>
+<li class="has-line-data" data-line-start="206" data-line-end="207">Value is a string representing the key</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="207" data-line-end="210"><code>job_id</code>
+<ul>
+<li class="has-line-data" data-line-start="208" data-line-end="210">Value is a string representing the <code>job_id</code> of the failed job.</li>
+</ul>
+</li>
+</ul>
+<h4 class="code-line" data-line-start=210 data-line-end=211><a id="Example_GET_request_in_python_210"></a>Example <code>GET</code> request in python</h4>
+<pre><code class="has-line-data" data-line-start="212" data-line-end="224">import requests
+
+url = &quot;https://ctdataservices-prod01lp.jax.org/api/archiving/archive_processing?api_key=KEY&amp;job_id=JOB_ID&quot;
+
+payload = {}
+headers= {}
+
+response = requests.request(&quot;GET&quot;, url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+</code></pre>
+<hr>
+<h3 class="code-line" data-line-start=225 data-line-end=226><a id="archive_success_225"></a>/archive_success</h3>
+<p class="has-line-data" data-line-start="226" data-line-end="227"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints">back to top</a></p>
+<p class="has-line-data" data-line-start="228" data-line-end="229">This endpoint will accept a <code>GET</code> request as described below. This endpoint is used by internal components only to update the metadata with the the current status of <code>completed</code> and notify the user that their files were successfully deposited into the archive.</p>
+<p class="has-line-data" data-line-start="230" data-line-end="231">The successful return will be the <code>gold_document</code> (a python dictionary) containning the metadata. The metadata document associated with the <code>job_id</code> will be updated. The keys to update are <code>archival_status</code>, <code>when_archival_completed</code>, <code>sourceSize</code>, <code>archivewdSize</code> and <code>dateArchived</code> with <code>&quot;processing&quot;</code> and <code>{timestamp}</code> respectively. The user will be sent an email notification about the successfully completed job.</p>
+<p class="has-line-data" data-line-start="232" data-line-end="233">The unsuccessful return of this endpoint will be a string (starting with <code>ERROR:</code>) describing why the workflow of this endpoint did not fully complete successfully.</p>
+<p class="has-line-data" data-line-start="234" data-line-end="235">This <code>GET</code> will include four args, <code>api_key</code> and <code>job_id</code>.</p>
+<ul>
+<li class="has-line-data" data-line-start="236" data-line-end="238"><code>api_key</code>
+<ul>
+<li class="has-line-data" data-line-start="237" data-line-end="238">Value is a string representing the key</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="238" data-line-end="240"><code>job_id</code>
+<ul>
+<li class="has-line-data" data-line-start="239" data-line-end="240">Value is a string representing the <code>job_id</code> of the failed job.</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="240" data-line-end="242"><code>sourceSize</code>
+<ul>
+<li class="has-line-data" data-line-start="241" data-line-end="242">Integer corresponding to the original size of the archived files.</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="242" data-line-end="245"><code>archivedSize</code>
+<ul>
+<li class="has-line-data" data-line-start="243" data-line-end="245">Integer corresponding to the final size of the archived files.</li>
+</ul>
+</li>
+</ul>
+<h4 class="code-line" data-line-start=245 data-line-end=246><a id="Example_GET_request_in_python_245"></a>Example <code>GET</code> request in python</h4>
+<pre><code class="has-line-data" data-line-start="247" data-line-end="259">import requests
+
+url = &quot;https://ctdataservices-prod01lp.jax.org/api/archiving/archive_success?api_key=KEY&amp;job_id=archive.1&amp;sourceSize=INTEGER&amp;archivedSize=INTEGER&quot;
+
+payload = {}
+headers= {}
+
+response = requests.request(&quot;GET&quot;, url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+</code></pre>
+<hr>
+<h3 class="code-line" data-line-start=260 data-line-end=261><a id="retrieve_failed_260"></a>/retrieve_failed</h3>
+<p class="has-line-data" data-line-start="261" data-line-end="262"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints">back to top</a></p>
+<p class="has-line-data" data-line-start="263" data-line-end="264">This endpoint will accept a <code>GET</code> request as described below. This endpoint is used by internal components only to update the metadata with the the current status of <code>failed</code> and notify the data services team of the error.</p>
+<p class="has-line-data" data-line-start="265" data-line-end="266">The successful return will be a string with the error message generated by pbs along with the <code>job_id</code>. The metadata document associated with the <code>job_id</code> will be updated. The keys to update are <code>retrieval_status</code> and <code>when_retrieval_completed</code> with <code>&quot;failed&quot;</code> and <code>None</code> respectively. The data services team will be sent an email notification about the failed job.</p>
+<p class="has-line-data" data-line-start="267" data-line-end="268">The unsuccessful return of this endpoint will be a string (starting with <code>ERROR:</code>) describing why the workflow of this endpoint did not fully complete successfully.</p>
+<p class="has-line-data" data-line-start="269" data-line-end="270">This <code>GET</code> will include three args, <code>api_key</code>, <code>obj_id</code> and <code>job_id</code>.</p>
+<ul>
+<li class="has-line-data" data-line-start="271" data-line-end="273"><code>api_key</code>
+<ul>
+<li class="has-line-data" data-line-start="272" data-line-end="273">Value is a string representing the key</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="273" data-line-end="275"><code>obj_id</code>
+<ul>
+<li class="has-line-data" data-line-start="274" data-line-end="275">String corresponding to the object id in mongoDB for the metadata.</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="275" data-line-end="278"><code>job_id</code>
+<ul>
+<li class="has-line-data" data-line-start="276" data-line-end="278">Value is a string representing the <code>job_id</code> of the failed job.</li>
+</ul>
+</li>
+</ul>
+<h4 class="code-line" data-line-start=278 data-line-end=279><a id="Example_GET_request_in_python_278"></a>Example <code>GET</code> request in python</h4>
+<pre><code class="has-line-data" data-line-start="280" data-line-end="292">import requests
+
+url = &quot;https://ctdataservices-prod01lp.jax.org/api/archiving/retrieve_failed?api_key=KEY&amp;obj_id=OBJ_ID&amp;job_id=JOB_ID&quot;
+
+payload = {}
+headers= {}
+
+response = requests.request(&quot;GET&quot;, url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+</code></pre>
+<hr>
+<h3 class="code-line" data-line-start=293 data-line-end=294><a id="retrieve_processing_293"></a>/retrieve_processing</h3>
+<p class="has-line-data" data-line-start="294" data-line-end="295"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints">back to top</a></p>
+<p class="has-line-data" data-line-start="296" data-line-end="297">This endpoint will accept a <code>GET</code> request as described below. This endpoint is used by internal components only to update the metadata with the the current status of <code>processing</code> (job started processing).</p>
+<p class="has-line-data" data-line-start="298" data-line-end="299">The successful return will be the <code>job_id</code>. The metadata document associated with the <code>job_id</code> will be updated. The keys to update are <code>retrieval_status</code> and <code>when_retrieval_started</code> with <code>&quot;processing&quot;</code> and <code>{timestamp}</code> respectively. The user will be sent an email notification about the job.</p>
+<p class="has-line-data" data-line-start="300" data-line-end="301">The unsuccessful return of this endpoint will be a string (starting with <code>ERROR:</code>) describing why the workflow of this endpoint did not fully complete successfully.</p>
+<p class="has-line-data" data-line-start="302" data-line-end="303">This <code>GET</code> will include three args, <code>api_key</code>, <code>obj_id</code> and <code>job_id</code>.</p>
+<ul>
+<li class="has-line-data" data-line-start="304" data-line-end="306"><code>api_key</code>
+<ul>
+<li class="has-line-data" data-line-start="305" data-line-end="306">Value is a string representing the key</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="306" data-line-end="308"><code>obj_id</code>
+<ul>
+<li class="has-line-data" data-line-start="307" data-line-end="308">String corresponding to the object id in mongoDB for the metadata.</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="308" data-line-end="311"><code>job_id</code>
+<ul>
+<li class="has-line-data" data-line-start="309" data-line-end="311">Value is a string representing the <code>job_id</code> of the failed job.</li>
+</ul>
+</li>
+</ul>
+<h4 class="code-line" data-line-start=311 data-line-end=312><a id="Example_GET_request_in_python_311"></a>Example <code>GET</code> request in python</h4>
+<pre><code class="has-line-data" data-line-start="313" data-line-end="325">import requests
+
+url = &quot;https://ctdataservices-prod01lp.jax.org/api/archiving/retrieve_processing?api_key=KEY&amp;obj_id=OBJ_ID&amp;job_id=JOB_ID&quot;
+
+payload = {}
+headers= {}
+
+response = requests.request(&quot;GET&quot;, url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+</code></pre>
+<hr>
+<h3 class="code-line" data-line-start=326 data-line-end=327><a id="retrieve_success_326"></a>/retrieve_success</h3>
+<p class="has-line-data" data-line-start="327" data-line-end="328"><a href="https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints">back to top</a></p>
+<p class="has-line-data" data-line-start="329" data-line-end="330">This endpoint will accept a <code>GET</code> request as described below. This endpoint is used by internal components only to update the metadata with the the current status of <code>completed</code> and notify the user that their files are ready for them to access in <code>/fastscratch</code>.</p>
+<p class="has-line-data" data-line-start="331" data-line-end="332">The successful return will be the <code>job_id</code>. The metadata document associated with the <code>job_id</code> will be updated. The keys to update are <code>retrieval_status</code> and <code>when_retrieval_completed</code> with <code>&quot;completed&quot;</code> and <code>{timestamp}</code> respectively. The user will be sent an email notification about the completed job.</p>
+<p class="has-line-data" data-line-start="333" data-line-end="334">The unsuccessful return of this endpoint will be a string (starting with <code>ERROR:</code>) describing why the workflow of this endpoint did not fully complete successfully.</p>
+<p class="has-line-data" data-line-start="335" data-line-end="336">This <code>GET</code> will include three args, <code>api_key</code>, <code>obj_id</code> and <code>job_id</code>.</p>
+<ul>
+<li class="has-line-data" data-line-start="337" data-line-end="339"><code>api_key</code>
+<ul>
+<li class="has-line-data" data-line-start="338" data-line-end="339">Value is a string representing the key</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="339" data-line-end="341"><code>obj_id</code>
+<ul>
+<li class="has-line-data" data-line-start="340" data-line-end="341">String corresponding to the object id in mongoDB for the metadata.</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="341" data-line-end="344"><code>job_id</code>
+<ul>
+<li class="has-line-data" data-line-start="342" data-line-end="344">Value is a string representing the <code>job_id</code> of the failed job.</li>
+</ul>
+</li>
+</ul>
+<h4 class="code-line" data-line-start=344 data-line-end=345><a id="Example_GET_request_in_python_344"></a>Example <code>GET</code> request in python</h4>
+<pre><code class="has-line-data" data-line-start="346" data-line-end="358">import requests
+
+url = &quot;https://ctdataservices-prod01lp.jax.org/api/archiving/retrieve_success?api_key=KEY&amp;obj_id=OBJ_ID&amp;job_id=JOB_ID&quot;
+
+payload = {}
+headers= {}
+
+response = requests.request(&quot;GET&quot;, url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+</code></pre>
+<hr>
+<hr>
+<p class="has-line-data" data-line-start="379" data-line-end="380">&lt;!-- SCRIPTS --&gt;</p>
+<p class="has-line-data" data-line-start="381" data-line-end="382">&lt;script src=“zenscroll-latest/zenscroll-min.js”&gt;&lt;/script&gt;</p>
+</body></html>
