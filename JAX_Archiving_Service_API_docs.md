@@ -58,7 +58,7 @@ A dictionary with the following required keys [`manager_user_id`, `user_id`, `pr
 4. When the job is completed, pbs will use the `archive_success` endpoint with `job_id`, `sourceSize` and `archivedSize`
    - This will notify user and update metadata.
 
-#### Example `archive` request
+#### Example `POST` request
 ```
 import requests
 
@@ -111,7 +111,7 @@ The body of the `POST` will contain the following keys [`api_key`, `requested_di
 4. When the retrieve job is completed, pbs will use the `retrieve_success` endpoint with `job_id`.
    - This will notify user and update metadata.
 
-#### Example `retrieve` request
+#### Example `POST` request
 ```
 import requests
 
