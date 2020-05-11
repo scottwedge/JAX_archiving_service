@@ -120,12 +120,12 @@ import requests
 url = "https://ctdataservices-prod01lp.jax.org/api/archiving/retrieve"
 
 payload = "{
-			"api_key":"KEY",
-			"requested_dirs":[
-								"obj_id_1",
-								"obj_id_2",
-								"obj_id_3"
-							]
+		"api_key":"KEY",
+		"requested_dirs":[
+						"obj_id_1",
+						"obj_id_2",
+						"obj_id_3"
+						]
 			}"
 headers = {
 		'Content-Type': 'application/json',
@@ -154,6 +154,33 @@ This `GET` will include two args `api_key` and `gold`
 import requests
 
 url = "https://ctdataservices-prod01lp.jax.org/api/archiving/get_collection?api_key=KEY&gold=true"
+
+payload = {}
+headers= {}
+
+response = requests.request("GET", url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+```
+---
+### /archive_failed
+[back to top][endpoints]
+
+This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`.
+
+This `GET` will include two args, `api_key` and `job_id`.
+
+- `api_key`
+   - Value is a string representing the key
+- `job_id`
+   - Value is a string representing the `job_id` of the failed job.
+
+#### Example of `GET` request
+```
+import requests
+
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/archive_failed?api_key=KEY&job_id=JOB_ID"
 
 payload = {}
 headers= {}
@@ -218,7 +245,7 @@ print(response.json())
 [1]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive
 [2]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve
 [3]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#get_collection
-[4]: https://www.google.com
+[4]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_failed
 [5]: https://www.google.com
 [6]: https://www.google.com
 [7]: https://www.google.com
