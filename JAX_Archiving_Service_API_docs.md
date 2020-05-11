@@ -134,7 +134,7 @@ print(response.text.encode('utf8'))
 print(response.json())
 ```
 ---
-### /get_collection
+### /get_collection ***(To Be Redesigned)***
 [back to top][endpoints]
 
 This endpoint will accept a `GET` request as described below. The successful return will be a mongoDB collection of documents. This endpoint is primarily to be used by the [archive frontend][frontend].
@@ -163,7 +163,7 @@ print(response.json())
 ### /archive_failed
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status` and `when_archival_failed` with `"failed"` and `{timestamp}` respectively. The data services team will be sent an email notification about the failed job.
+This endpoint will accept a `GET` request as described below. The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status` and `when_archival_failed` with `"failed"` and `{timestamp}` respectively. The data services team will be sent an email notification about the failed job.
 
 This `GET` will include two args, `api_key` and `job_id`.
 
@@ -190,7 +190,7 @@ print(response.json())
 ### /archive_processing
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status` and `when_archival_started` with `"processing"` and `{timestamp}` respectively. The data services team will be sent an email notification about the failed job.
+This endpoint will accept a `GET` request as described below. The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status` and `when_archival_started` with `"processing"` and `{timestamp}` respectively. The data services team will be sent an email notification about the failed job.
 
 This `GET` will include two args, `api_key` and `job_id`.
 
@@ -248,7 +248,7 @@ print(response.json())
 ### /retrieve_failed
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_completed` with `"failed"` and `None` respectively. The data services team will be sent an email notification about the failed job.
+This endpoint will accept a `GET` request as described below. The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_completed` with `"failed"` and `None` respectively. The data services team will be sent an email notification about the failed job.
 
 This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
 
@@ -273,10 +273,11 @@ response = requests.request("GET", url, headers=headers, data=payload, verify=Fa
 print(response.text.encode('utf8'))
 print(response.json())
 ```
+---
 ### /retrieve_processing
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_started` with `"processing"` and `{timestamp}` respectively. The user will be sent an email notification about the job.
+This endpoint will accept a `GET` request as described below. The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_started` with `"processing"` and `{timestamp}` respectively. The user will be sent an email notification about the job.
 
 This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
 
@@ -305,7 +306,7 @@ print(response.json())
 ### /retrieve_success
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_completed` with `"completed"` and `{timestamp}` respectively. The user will be sent an email notification about the completed job.
+This endpoint will accept a `GET` request as described below. The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_completed` with `"completed"` and `{timestamp}` respectively. The user will be sent an email notification about the completed job.
 
 This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
 
