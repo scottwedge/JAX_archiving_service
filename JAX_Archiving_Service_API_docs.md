@@ -120,10 +120,10 @@ url = "https://ctdataservices-prod01lp.jax.org/api/archiving/retrieve"
 payload = "{
 		"api_key":"KEY",
 		"requested_dirs":[
-						"obj_id_1",
-						"obj_id_2",
-						"obj_id_3"
-						]
+				"obj_id_1",
+				"obj_id_2",
+				"obj_id_3"
+				]
 			}"
 headers = {
 		'Content-Type': 'application/json',
