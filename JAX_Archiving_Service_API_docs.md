@@ -21,7 +21,7 @@
 ### /archive
 [back to top][endpoints]
 
-This endpoint will be used by the [archive frontend][frontend] or programatically by users with an `api_key`. This endpoint will accept a valid `POST` archiving request as described below. The successful return for this endpoint is the object id of the metadata in mongoDB. A successful return means your request was successfully submitted to pbs and further updates on the status (to the user, data services team or metadata document) of the archiving event will be directed by pbs via this archiving microservice using other endpoints.
+This endpoint will be used by the [archive frontend][frontend] or programatically by users with an `api_key` in order to deposit files into the archive (tier 3) and store metadata. This endpoint will accept a valid `POST` archiving request as described below. The successful return for this endpoint is the object id of the metadata in mongoDB. A successful return means your request was successfully submitted to pbs and further updates on the status (to the user, data services team or metadata document) of the archiving event will be directed by pbs via this archiving microservice using other endpoints.
 
 An unsuccessful return value will be a string (starting with `ERROR:`) describing why the request was not submitted to pbs.
 
@@ -92,7 +92,7 @@ print(response.json())
 ### /retrieve
 [back to top][endpoints]
 
-This endpoint will be used by the [archive frontend][frontend] or programatically by users with an `api_key`. This endpoint will accept a valid `POST` retrieve request as described below. The successful return will be an integer corresponding to the number of directories submitted for retrieval.
+This endpoint will be used by the [archive frontend][frontend] or programatically by users with an `api_key` in order to retrieve archived (tier 3) files. This endpoint will accept a valid `POST` retrieve request as described below. The successful return will be an integer corresponding to the number of directories submitted for retrieval.
 
 An unsuccessful return value will be a string (starting with `ERROR:`) describing why the request was not submitted to pbs.
 
