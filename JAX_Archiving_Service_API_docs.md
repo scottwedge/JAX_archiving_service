@@ -303,6 +303,35 @@ response = requests.request("GET", url, headers=headers, data=payload, verify=Fa
 print(response.text.encode('utf8'))
 print(response.json())
 ```
+---
+### /retrieve_success
+[back to top][endpoints]
+
+This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_completed` with `"completed"` and `{timestamp}` respectively. The user will be sent an email notification about the completed job.
+
+This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
+
+- `api_key`
+   - Value is a string representing the key
+- `obj_id`
+   - String corresponding to the object id in mongoDB for the metadata.
+- `job_id`
+   - Value is a string representing the `job_id` of the failed job.
+
+#### Example of `GET` request
+```
+import requests
+
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/retrieve_success?api_key=KEY&obj_id=OBJ_ID&job_id=JOB_ID"
+
+payload = {}
+headers= {}
+
+response = requests.request("GET", url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+```
 
 ---
 ---
@@ -356,7 +385,7 @@ print(response.json())
 [6]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_success
 [7]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve_failed
 [8]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve_processing
-[9]: https://www.google.com
+[9]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve_success
 [frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
 [endpoints]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints
 [metadata_link]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#metadata
