@@ -1,3 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<title></title>
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="">
+<!--[if lt IE 9]>
+<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<link rel="shortcut icon" href="">
+</head>
+<body>
+
 # JAX Archiving Service 
 
 [![N|Solid](https://clic-ctsa.org/sites/default/files/styles/large/public/2019-10/jacksonLabLogo.png)](https://jacksonlaboratory.sharepoint.com/sites/ResearchIT)
@@ -360,16 +378,6 @@ print(response.json())
 ---
 ---
 
-<script\>
-function scrollToTop() {
-    var position =
-        document.body.scrollTop || document.documentElement.scrollTop;
-    if (position) {
-        window.scrollBy(0, -Math.max(1, Math.floor(position / 10)));
-        scrollAnimation = setTimeout("scrollToTop()", 30);
-    } else clearTimeout(scrollAnimation);
-}
-</script\>
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
@@ -385,3 +393,10 @@ function scrollToTop() {
 [frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
 [endpoints]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints
 [metadata_link]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#metadata
+
+
+<!-- SCRIPTS -->
+<!-- Example: <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> -->
+<script src="zenscroll-latest/zenscroll-min.js"></script>
+</body>
+</html>
