@@ -125,10 +125,8 @@ payload = "{
 				"obj_id_3"
 				]
 	}"
-headers = {
-		'Content-Type': 'application/json',
-		'Content-Type': 'text/plain'
-}
+
+headers = {'Content-Type': 'application/json'}
 
 response = requests.request("POST", url, headers=headers, data=payload, verify=False)
 
