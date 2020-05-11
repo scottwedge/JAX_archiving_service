@@ -360,6 +360,16 @@ print(response.json())
 ---
 ---
 
+<script\>
+function scrollToTop() {
+    var position =
+        document.body.scrollTop || document.documentElement.scrollTop;
+    if (position) {
+        window.scrollBy(0, -Math.max(1, Math.floor(position / 10)));
+        scrollAnimation = setTimeout("scrollToTop()", 30);
+    } else clearTimeout(scrollAnimation);
+}
+</script\>
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
