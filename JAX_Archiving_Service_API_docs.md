@@ -198,13 +198,7 @@ print(response.json())
 
 #### Example article excerpt
 
-> The overriding design goal for Markdown's
-> formatting syntax is to make it as readable
-> as possible. The idea is that a
-> Markdown-formatted document should be
-> publishable as-is, as plain text, without
-> looking like it's been marked up with tags
-> or formatting instructions.
+> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard > > dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen > > book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially > > > > unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more > > recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 
 
 | Example | Table |
