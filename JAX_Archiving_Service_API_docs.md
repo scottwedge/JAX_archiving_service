@@ -21,7 +21,7 @@
 ### /archive
 [back to top][endpoints]
 
-This endpoint will accept a valid `POST` archiving request as described below. The successful return for this endpoint is the object id of the metadata in mongoDB. A successful return means your request was successfully submitted to pbs and further updates on the status of the archiving event will be directed by pbs via this archiving microservice.
+This endpoint will be used by the [archive frontend][frontend] or programatically by users with an `api_key`. This endpoint will accept a valid `POST` archiving request as described below. The successful return for this endpoint is the object id of the metadata in mongoDB. A successful return means your request was successfully submitted to pbs and further updates on the status (to the user, data services team or metadata document) of the archiving event will be directed by pbs via this archiving microservice using other endpoints.
 
 An unsuccessful return value will be a string (starting with `ERROR:`) describing why the request was not submitted to pbs.
 
@@ -29,7 +29,7 @@ The body of the `POST` request must contain the following keys [`api_key`, `meta
 - `api_key`
    - Value is the string representing the key
 - `metadata`
-   - Value is a dictionary containing some required keys. Described in more detail below [click here][metadata_link].
+   - Value is a dictionary (in python or equivalent in other language) containing some required keys. Described in more detail below [click here][metadata_link].
 - `source_folder`
    - String representing the absolute path to the directory requested to be archived
 - `service_path`
@@ -41,7 +41,7 @@ The body of the `POST` request must contain the following keys [`api_key`, `meta
 ##### `metadata`
 [back to /archive][1]
 
-A dictionary with the following required keys [`manager_user_id`, `user_id`, `project_name`, `grant_id`, `notes`, `system_groups`, `request_type`]
+A dictionary (in python or equivalent in other language) with the following required keys [`manager_user_id`, `user_id`, `project_name`, `grant_id`, `notes`, `system_groups`, `request_type`]
 -   `manager_user_id` The short username of the principal investigator (PI) owning the data.
 -   `user_id` The short username of the person who generated the data. In many cases this is a postdoc. It can be the PI. 
 -   `project_name` The name of the project the user specifies that the data is associated with.
@@ -53,12 +53,12 @@ A dictionary with the following required keys [`manager_user_id`, `user_id`, `pr
 ##### Flow of actions
 1. object_id of mongoDB document is returned as a string
 2. After request is submitted to pbs, metadata is updated with `job_id`, user receives an email notification about request being submitted to the queue.
-3. When pbs starts to process the job it will use the `archive_processing` endpoint with the `job_id`. 
+3. When pbs starts to process the job it will use the [`/archive_processing`][5] endpoint with the `job_id`. 
    - This will notify user and update metadata.
-4. When the job is completed, pbs will use the `archive_success` endpoint with `job_id`, `sourceSize` and `archivedSize`
+4. When the job is completed, pbs will use the [`/archive_success`][6] endpoint with `job_id`, `sourceSize` and `archivedSize`
    - This will notify user and update metadata.
 
-#### Example `POST` request
+#### Example `POST` request in python
 ```
 import requests
 
@@ -92,7 +92,7 @@ print(response.json())
 ### /retrieve
 [back to top][endpoints]
 
-This endpoint will accept a valid `POST` retrieve request as described below. The successful return will be an integer corresponding to the number of directories submitted for retrieval.
+This endpoint will be used by the [archive frontend][frontend] or programatically by users with an `api_key`. This endpoint will accept a valid `POST` retrieve request as described below. The successful return will be an integer corresponding to the number of directories submitted for retrieval.
 
 An unsuccessful return value will be a string (starting with `ERROR:`) describing why the request was not submitted to pbs.
 
@@ -111,7 +111,7 @@ The body of the `POST` will contain the following keys [`api_key`, `requested_di
 4. When the retrieve job is completed, pbs will use the `retrieve_success` endpoint with `job_id`.
    - This will notify user and update metadata.
 
-#### Example `POST` request
+#### Example `POST` request in python
 ```
 import requests
 
@@ -134,7 +134,7 @@ print(response.text.encode('utf8'))
 print(response.json())
 ```
 ---
-### /get_collection ***(To Be Redesigned)***
+### /get_collection (***To Be Redesigned***)
 [back to top][endpoints]
 
 This endpoint will accept a `GET` request as described below. The successful return will be a mongoDB collection of documents. This endpoint is primarily to be used by the [archive frontend][frontend].
@@ -145,7 +145,7 @@ This `GET` will include two args `api_key` and `gold`
 - `gold`
    - boolean, `true` for permanently archived metadata, `false` for operational metadata
 
-#### example of `GET` request
+#### example of `GET` request in python
 ```
 import requests
 
@@ -163,7 +163,11 @@ print(response.json())
 ### /archive_failed
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status` and `when_archival_failed` with `"failed"` and `{timestamp}` respectively. The data services team will be sent an email notification about the failed job.
+This endpoint will accept a `GET` request as described below. 
+
+The successful return will be a string with the error message generated by pbs along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status` and `when_archival_failed` with `"failed"` and `{timestamp}` respectively. The data services team will be sent an email notification about the failed job.
+
+The unsuccessful return of this endpoint will be a string (starting with `ERROR:`) describing why the workflow of this endpoint did not fully complete successfully.
 
 This `GET` will include two args, `api_key` and `job_id`.
 
@@ -172,7 +176,7 @@ This `GET` will include two args, `api_key` and `job_id`.
 - `job_id`
    - Value is a string representing the `job_id` of the failed job.
 
-#### Example of `GET` request
+#### Example `GET` request in python
 ```
 import requests
 
@@ -190,7 +194,11 @@ print(response.json())
 ### /archive_processing
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status` and `when_archival_started` with `"processing"` and `{timestamp}` respectively. The data services team will be sent an email notification about the failed job.
+This endpoint will accept a `GET` request as described below. 
+
+The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status` and `when_archival_started` with `"processing"` and `{timestamp}` respectively. The data services team will be sent an email notification about the failed job.
+
+The unsuccessful return of this endpoint will be a string (starting with `ERROR:`) describing why the workflow of this endpoint did not fully complete successfully.
 
 This `GET` will include two args, `api_key` and `job_id`.
 
@@ -199,7 +207,7 @@ This `GET` will include two args, `api_key` and `job_id`.
 - `job_id`
    - Value is a string representing the `job_id` of the failed job.
 
-#### Example of `GET` request
+#### Example `GET` request in python
 ```
 import requests
 
@@ -217,7 +225,11 @@ print(response.json())
 ### /archive_success
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be the `gold_document` (a python dictionary) containning the metadata. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status`, `when_archival_completed`, `sourceSize`, `archivewdSize` and `dateArchived` with `"processing"` and `{timestamp}` respectively. The user will be sent an email notification about the successfully completed job.
+This endpoint will accept a `GET` request as described below. 
+
+The successful return will be the `gold_document` (a python dictionary) containning the metadata. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status`, `when_archival_completed`, `sourceSize`, `archivewdSize` and `dateArchived` with `"processing"` and `{timestamp}` respectively. The user will be sent an email notification about the successfully completed job.
+
+The unsuccessful return of this endpoint will be a string (starting with `ERROR:`) describing why the workflow of this endpoint did not fully complete successfully.
 
 This `GET` will include four args, `api_key` and `job_id`.
 
@@ -230,7 +242,7 @@ This `GET` will include four args, `api_key` and `job_id`.
 - `archivedSize`
    - Integer corresponding to the final size of the archived files.
 
-#### Example of `GET` request
+#### Example `GET` request in python
 ```
 import requests
 
@@ -248,7 +260,11 @@ print(response.json())
 ### /retrieve_failed
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_completed` with `"failed"` and `None` respectively. The data services team will be sent an email notification about the failed job.
+This endpoint will accept a `GET` request as described below. 
+
+The successful return will be a string with the error message generated by pbs along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_completed` with `"failed"` and `None` respectively. The data services team will be sent an email notification about the failed job.
+
+The unsuccessful return of this endpoint will be a string (starting with `ERROR:`) describing why the workflow of this endpoint did not fully complete successfully.
 
 This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
 
@@ -259,7 +275,7 @@ This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
 - `job_id`
    - Value is a string representing the `job_id` of the failed job.
 
-#### Example of `GET` request
+#### Example `GET` request in python
 ```
 import requests
 
@@ -277,7 +293,11 @@ print(response.json())
 ### /retrieve_processing
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_started` with `"processing"` and `{timestamp}` respectively. The user will be sent an email notification about the job.
+This endpoint will accept a `GET` request as described below. 
+
+The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_started` with `"processing"` and `{timestamp}` respectively. The user will be sent an email notification about the job.
+
+The unsuccessful return of this endpoint will be a string (starting with `ERROR:`) describing why the workflow of this endpoint did not fully complete successfully.
 
 This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
 
@@ -288,7 +308,7 @@ This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
 - `job_id`
    - Value is a string representing the `job_id` of the failed job.
 
-#### Example of `GET` request
+#### Example `GET` request in python
 ```
 import requests
 
@@ -306,7 +326,11 @@ print(response.json())
 ### /retrieve_success
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_completed` with `"completed"` and `{timestamp}` respectively. The user will be sent an email notification about the completed job.
+This endpoint will accept a `GET` request as described below. 
+
+The successful return will be the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_completed` with `"completed"` and `{timestamp}` respectively. The user will be sent an email notification about the completed job.
+
+The unsuccessful return of this endpoint will be a string (starting with `ERROR:`) describing why the workflow of this endpoint did not fully complete successfully.
 
 This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
 
@@ -317,7 +341,7 @@ This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
 - `job_id`
    - Value is a string representing the `job_id` of the failed job.
 
-#### Example of `GET` request
+#### Example `GET` request in python
 ```
 import requests
 
@@ -337,28 +361,6 @@ print(response.json())
 
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
-
-
-   [dill]: <https://github.com/joemccann/dillinger>
-   [git-repo-url]: <https://github.com/joemccann/dillinger.git>
-   [john gruber]: <http://daringfireball.net>
-   [df1]: <http://daringfireball.net/projects/markdown/>
-   [markdown-it]: <https://github.com/markdown-it/markdown-it>
-   [Ace Editor]: <http://ace.ajax.org>
-   [node.js]: <http://nodejs.org>
-   [Twitter Bootstrap]: <http://twitter.github.com/bootstrap/>
-   [jQuery]: <http://jquery.com>
-   [@tjholowaychuk]: <http://twitter.com/tjholowaychuk>
-   [express]: <http://expressjs.com>
-   [AngularJS]: <http://angularjs.org>
-   [Gulp]: <http://gulpjs.com>
-
-   [PlDb]: <https://github.com/joemccann/dillinger/tree/master/plugins/dropbox/README.md>
-   [PlGh]: <https://github.com/joemccann/dillinger/tree/master/plugins/github/README.md>
-   [PlGd]: <https://github.com/joemccann/dillinger/tree/master/plugins/googledrive/README.md>
-   [PlOd]: <https://github.com/joemccann/dillinger/tree/master/plugins/onedrive/README.md>
-   [PlMe]: <https://github.com/joemccann/dillinger/tree/master/plugins/medium/README.md>
-   [PlGa]: <https://github.com/RahulHP/dillinger/blob/master/plugins/googleanalytics/README.md>
 
 [1]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive
 [2]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve
