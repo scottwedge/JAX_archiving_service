@@ -12,12 +12,10 @@
 - [`/get_collection`][3]
 - [`/archive_failed`][4]
 - [`/archive_processing`][5]
-- [`/archive_submitted`][6]
-- [`/archive_success`][7]
-- [`/retrieve_failed`][8]
-- [`/retrieve_processing`][9]
-- [`/retrieve_submitted`][10]
-- [`/retrieve_success`][11]
+- [`/archive_success`][6]
+- [`/retrieve_failed`][7]
+- [`/retrieve_processing`][8]
+- [`/retrieve_success`][9]
 
 ---
 ### /archive
@@ -167,7 +165,7 @@ print(response.json())
 ### /archive_failed
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`.
+This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status` and `when_archival_failed` with `"failed"` and `{timestamp}` respectively. The data services team will be sent an email notification about the failed job.
 
 This `GET` will include two args, `api_key` and `job_id`.
 
@@ -190,7 +188,60 @@ response = requests.request("GET", url, headers=headers, data=payload, verify=Fa
 print(response.text.encode('utf8'))
 print(response.json())
 ```
+---
+### /archive_processing
+[back to top][endpoints]
 
+This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status` and `when_archival_started` with `"processing"` and `{timestamp}` respectively. The data services team will be sent an email notification about the failed job.
+
+This `GET` will include two args, `api_key` and `job_id`.
+
+- `api_key`
+   - Value is a string representing the key
+- `job_id`
+   - Value is a string representing the `job_id` of the failed job.
+
+#### Example of `GET` request
+```
+import requests
+
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/archive_processing?api_key=KEY&job_id=JOB_ID"
+
+payload = {}
+headers= {}
+
+response = requests.request("GET", url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+```
+---
+### /archive_success
+[back to top][endpoints]
+
+This endpoint will accept a `GET` request as described below. The successful return will be the `gold_document` (a python dictionary) containning the metadata. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status`, `when_archival_completed`, `sourceSize`, `archivewdSize` and `dateArchived` with `"processing"` and `{timestamp}` respectively. The user will be sent an email notification about the successfully completed job.
+
+This `GET` will include two args, `api_key` and `job_id`.
+
+- `api_key`
+   - Value is a string representing the key
+- `job_id`
+   - Value is a string representing the `job_id` of the failed job.
+
+#### Example of `GET` request
+```
+import requests
+
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/archive_success?api_key=KEY&job_id=archive.1&sourceSize=INTEGER&archivedSize=INTEGER"
+
+payload = {}
+headers= {}
+
+response = requests.request("GET", url, headers=headers, data = payload)
+
+print(response.text.encode('utf8'))
+print(response.json())
+```
 
 ---
 ---
@@ -240,13 +291,11 @@ print(response.json())
 [2]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve
 [3]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#get_collection
 [4]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_failed
-[5]: https://www.google.com
-[6]: https://www.google.com
+[5]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_processing
+[6]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_success
 [7]: https://www.google.com
 [8]: https://www.google.com
 [9]: https://www.google.com
-[10]: https://www.google.com
-[11]: https://www.google.com
 [frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
 [endpoints]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints
 [metadata_link]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#metadata
