@@ -221,12 +221,16 @@ print(response.json())
 
 This endpoint will accept a `GET` request as described below. The successful return will be the `gold_document` (a python dictionary) containning the metadata. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status`, `when_archival_completed`, `sourceSize`, `archivewdSize` and `dateArchived` with `"processing"` and `{timestamp}` respectively. The user will be sent an email notification about the successfully completed job.
 
-This `GET` will include two args, `api_key` and `job_id`.
+This `GET` will include four args, `api_key` and `job_id`.
 
 - `api_key`
    - Value is a string representing the key
 - `job_id`
    - Value is a string representing the `job_id` of the failed job.
+- `sourceSize`
+   - Integer corresponding to the original size of the archived files.
+- `archivedSize`
+   - Integer corresponding to the final size of the archived files.
 
 #### Example of `GET` request
 ```
@@ -237,7 +241,36 @@ url = "https://ctdataservices-prod01lp.jax.org/api/archiving/archive_success?api
 payload = {}
 headers= {}
 
-response = requests.request("GET", url, headers=headers, data = payload)
+response = requests.request("GET", url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
+```
+---
+### /retrieve_failed
+[back to top][endpoints]
+
+This endpoint will accept a `GET` request as described below. The successful return will be a string stating that the metadata was successfully updated along with the `job_id`. The metadata document associated with the `job_id` will be updated. The keys to update are `retrieval_status` and `when_retrieval_completed` with `"failed"` and `None` respectively. The data services team will be sent an email notification about the failed job.
+
+This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
+
+- `api_key`
+   - Value is a string representing the key
+- `obj_id`
+   - String corresponding to the object id in mongoDB for the metadata.
+- `job_id`
+   - Value is a string representing the `job_id` of the failed job.
+
+#### Example of `GET` request
+```
+import requests
+
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/retrieve_failed?api_key=KEY&obj_id=OBJ_ID&job_id=JOB_ID"
+
+payload = {}
+headers= {}
+
+response = requests.request("GET", url, headers=headers, data=payload, verify=False)
 
 print(response.text.encode('utf8'))
 print(response.json())
@@ -293,7 +326,7 @@ print(response.json())
 [4]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_failed
 [5]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_processing
 [6]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#archive_success
-[7]: https://www.google.com
+[7]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#retrieve_failed
 [8]: https://www.google.com
 [9]: https://www.google.com
 [frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
