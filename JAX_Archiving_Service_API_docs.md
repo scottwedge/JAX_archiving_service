@@ -134,7 +134,8 @@ print(response.text.encode('utf8'))
 print(response.json())
 ```
 ---
-### /get_collection (***To Be Redesigned***)
+### /get_collection 
+(***To Be Redesigned***)
 [back to top][endpoints]
 
 This endpoint will accept a `GET` request as described below. The successful return will be a mongoDB collection of documents. This endpoint is primarily to be used by the [archive frontend][frontend].
