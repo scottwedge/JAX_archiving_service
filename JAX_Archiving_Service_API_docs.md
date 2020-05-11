@@ -124,7 +124,7 @@ payload = "{
 				"obj_id_2",
 				"obj_id_3"
 				]
-			}"
+	}"
 headers = {
 		'Content-Type': 'application/json',
 		'Content-Type': 'text/plain'
