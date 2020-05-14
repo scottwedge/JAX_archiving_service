@@ -16,6 +16,7 @@ url = f"{protocol}://{host}:{port}/{route}"
 
 headers = {'Content-Type': 'application/json'}
 
+## note this needs to be a string, not a dict(); note f-string double curly:
 data = f'''{{ 
     "api_key": "{api_key}", 
     "my_key": "my_value" 
