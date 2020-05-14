@@ -14,6 +14,8 @@ id1 = 'mpolo'
 route = f'info/{id1}'
 url = f"{protocol}://{host}:{port}/{route}"
 
+## this sets 'flask.request.is_json' to 'True'; can then retrieve params on server 
+##   as json using 'flask.request.json':
 headers = {'Content-Type': 'application/json'}
 
 ## note this needs to be a string, not a dict(); note f-string double curly:
