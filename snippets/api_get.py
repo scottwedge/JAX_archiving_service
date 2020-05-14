@@ -20,7 +20,7 @@ url = f"{protocol}://{host}:{port}/{route}?{params}"
 ##   generic Exception handling below is adequate for most purposes:
 
 try:
-    response = requests.get(url, verify=False)
+    response = requests.get(url, verify=False)    ## verify=False: for ssh w/o certificate
     if response.status_code != 200:
         raise Exception(f"Status code != 200; status_code: '{response.status_code}'")
     output = response.text.encode('utf8')

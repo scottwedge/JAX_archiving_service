@@ -89,6 +89,13 @@ def info_url(id1):
 ## MAIN: 
 
 if __name__.split('.')[0] == '__main__': 
-    ## listen to localhost only; ssl w/o certificates; auto refresh http server after code changes:
-    app.run(host='127.0.0.1', ssl_context='adhoc', debug=True)  
+    ## execute main as 'try' block in order to gracefully handle and report any uncaught exceptions:
+    try:
+        ## listen to localhost only; ssl w/o certificates; auto refresh http server after code changes:
+        app.run(host='127.0.0.1', ssl_context='adhoc', debug=True)  
+    except Exception as e:
+        ## we will normally log to file and email, but here temporarily we just write to stdout:
+        sys.stderr.write(f"ERROR: uncaught exception of type '{type(e)}': {e}")
+        sys.exit(3)
+    sys.exit(0)
 

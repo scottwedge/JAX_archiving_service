@@ -31,7 +31,8 @@ print(f"data: {data}")
 ##   generic Exception handling below is adequate for most purposes:
 
 try:
-    response = requests.post(url, headers=headers, data=data, verify=False)
+    ## verify=False: for ssh w/o certificate
+    response = requests.post(url, headers=headers, data=data, verify=False) 
     if response.status_code != 200:
         raise Exception(f"Status code != 200; status_code: '{response.status_code}'")
     output = response.text.encode('utf-8')
