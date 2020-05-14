@@ -14,69 +14,81 @@ app.config['SECRET_KEY'] = config_session_key       ## random/secret key used to
 app.config['SESSION_TYPE'] = config_session_type    ## mode for storing server-side session properties
 flask_session.Session(app)                          ## make session server-side; set/get properties thru flask.session
 
-@app.route("/archive")
+#############################################################################################################
+## ROUTES:
+
+@app.route("/archive", methods=['POST'])
 def archive_url():
     url = "/archive"
-    args_str = markupsafe.escape(str(flask.request.args))
-    return f"ERROR: reached unimplemented route '{url}'; args: '{args_str}'"
+    if flask.request.is_json:           ## submitted parameters thru api call w/ json
+        return f"ERROR: POST reached unimplemented route '{url}'; args: '{flask.request.json}'"
+    else:                               ## submitted parameters thru web page form
+        return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
 
-@app.route("/retrieve")
+@app.route("/retrieve", methods=['POST'])
 def retrieve_url():
     url = "/retrieve"
-    args_str = markupsafe.escape(str(flask.request.args))
-    return f"ERROR: reached unimplemented route '{url}'; args: '{args_str}'"
+    if flask.request.is_json:           ## submitted parameters thru api call w/ json
+        return f"ERROR: POST reached unimplemented route '{url}'; args: '{flask.request.json}'"
+    else:                               ## submitted parameters thru web page form
+        return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
 
-@app.route("/archive_failed")
+@app.route("/archive_failed", methods=['GET'])
 def archive_failed_url():
     url = "/archive_failed"
-    args_str = markupsafe.escape(str(flask.request.args))
-    return f"ERROR: reached unimplemented route '{url}'; args: '{args_str}'"
+    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
 
-@app.route("/archive_processing")
+@app.route("/archive_processing", methods=['GET'])
 def archive_processing_url():
     url = "/archive_processing"
-    args_str = markupsafe.escape(str(flask.request.args))
-    return f"ERROR: reached unimplemented route '{url}'; args: '{args_str}'"
+    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
 
-@app.route("/archive_success")
-def archive_succes_url():
+@app.route("/archive_success", methods=['GET'])
+def archive_success_url():
     url = "/archive_success"
-    args_str = markupsafe.escape(str(flask.request.args))
-    return f"ERROR: reached unimplemented route '{url}'; args: '{args_str}'"
+    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
 
-@app.route("/retrieve_failed")
+@app.route("/retrieve_failed", methods=['GET'])
 def retrieve_failed_url():
     url = "/retrieve_failed"
-    args_str = markupsafe.escape(str(flask.request.args))
-    return f"ERROR: reached unimplemented route '{url}'; args: '{args_str}'"
+    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
 
-@app.route("/retrieve_processing")
+@app.route("/retrieve_processing", methods=['GET'])
 def retrieve_processing_url():
     url = "/retrieve_processing"
-    args_str = markupsafe.escape(str(flask.request.args))
-    return f"ERROR: reached unimplemented route '{url}'; args: '{args_str}'"
+    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
 
-@app.route("/retrieve_success")
+@app.route("/retrieve_success", methods=['GET'])
 def retrieve_success_url():
     url = "/retrieve_success"
-    args_str = markupsafe.escape(str(flask.request.args))
-    return f"ERROR: reached unimplemented route '{url}'; args: '{args_str}'"
+    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
 
 ## for now, just for testing/demo flask:
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def root_url():
-  url = "/"
-  args_str = markupsafe.escape(str(flask.request.args))
-  return f"ERROR: reached unimplemented route '{url}'; args: '{args_str}'"
+    url = "/"
+    if flask.request.method == 'GET':   ## submitted parameters as part of URI
+        return f"ERROR: GET reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+    elif flask.request.is_json:         ## submitted parameters thru api call w/ json
+        return f"ERROR: POST reached unimplemented route '{url}'; args: '{flask.request.json}'"
+    else:                               ## submitted parameters thru web page form
+        return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
 
 ## for now, just for testing/demo flask:
-@app.route("/info/<id>")
-def info_url(id):
-  url = "/info"
-  args_str = markupsafe.escape(str(flask.request.args))
-  id_str = markupsafe.escape(str(id))
-  return f"ERROR: reached unimplemented route '{url/id_str}'; args: '{args_str}'"
+@app.route("/info/<id1>", methods=['GET', 'POST'])
+def info_url(id1):
+    url = f"/info/{id1}"
+    if flask.request.method == 'GET':   ## submitted parameters as part of URI
+        return f"ERROR: GET reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+    elif flask.request.is_json:         ## submitted parameters thru api call w/ json
+        return f"ERROR: POST reached unimplemented route '{url}'; args: '{flask.request.json}'"
+    else:                               ## submitted parameters thru web page form
+        return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
+
+###########################################################################################
+## MAIN:
 
 if __name__.split('.')[0] == '__main__': 
-  app.run(host='127.0.0.1', ssl_context='adhoc')                 ## ssl w/o certificates; listen to localhost only
+    ## listen to localhost only; ssl w/o certificates; auto refresh http server after code changes:
+    app.run(host='127.0.0.1', ssl_context='adhoc', debug=True)  
 
