@@ -56,19 +56,33 @@ def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
 #     return
 
 
+# def get_logger(level, msg):
+#     switcher = {
+#         "debug": LOGGER.debug(msg),
+#         "info": LOGGER.info(msg),
+#         "warning": LOGGER.warning(msg),
+#         "error": LOGGER.error(msg),
+#         "critical": LOGGER.critical(msg),
+#     }
+#     switcher.get(level.lower(), f"{level} is not a recognized log level")
+
+
 def log_email(msg, error=False):
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     filename = getframeinfo(currentframe()).filename
     lineno = inspect.currentframe().f_back.f_lineno
-    log_prefix = f"[{ts}, {filename}:{lineno}]"
+    log_prefix = (
+        f"[{ts}, {filename}:{lineno}, ERROR]"
+        if error
+        else f"[{ts}, {filename}:{lineno}]"
+    )
     log_msg = f"{log_prefix} {msg}"
     if error:
-        log_msg = f"{log_prefix} ERROR: {msg}"
         sys.stderr.write(f"{log_msg}\n")
-        # send email here
         # send_err_email(body)
-        LOGGER.error(log_msg)
-    else:
-        LOGGER.info(log_msg)
+    LOGGER.info(log_msg)
     print(log_msg)
     return
+
+
+log_email("This should be an error log message")
