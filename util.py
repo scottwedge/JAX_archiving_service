@@ -9,10 +9,10 @@ import smtplib
 import sys
 
 
-body = (
-    f"Hi {user['fname'].capitalize()},\nYour request to {action} {source_path} has "
-    f"{'completed successfully' if status else 'failed'}.\n"
-)
+# body = (
+#     f"Hi {user['fname'].capitalize()},\nYour request to {action} {source_path} has "
+#     f"{'completed successfully' if status else 'failed'}.\n"
+# )
 
 
 def test_email_body():
@@ -39,10 +39,10 @@ def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
             result = server.sendmail("return-email@jax.org", recipients, msg_text)
             if result:
                 err_msg = f"ERROR: The following recipients were refused, {result}"
-                # LOGGER.error(err_msg)
+                LOGGER.error(err_msg)
                 sys.stderr.write(err_msg)
     except Exception as e:
-        # LOGGER.debug(f"error sending email: {e}")
+        LOGGER.debug(f"error sending email: {e}")
         pass
 
 
