@@ -1,5 +1,6 @@
-import requests
 import sys
+import json
+import requests
 
 ## should be from config module:
 
@@ -18,11 +19,10 @@ url = f"{protocol}://{host}:{port}/{route}"
 ##   as json using 'flask.request.json':
 headers = {'Content-Type': 'application/json'}
 
-## note this needs to be a string, not a dict(); note f-string double curly:
-data = f'''{{ 
-    "api_key": "{api_key}", 
+data = { 
+    "api_key": api_key, 
     "my_key": "my_value" 
-}}'''
+}
 
 print(f"data: {data}")
 
@@ -32,6 +32,7 @@ print(f"data: {data}")
 
 try:
     ## verify=False: for ssh w/o certificate
+    data = json.dumps(data)
     response = requests.post(url, headers=headers, data=data, verify=False) 
     if response.status_code != 200:
         raise Exception(f"Status code != 200; status_code: '{response.status_code}'")
@@ -42,4 +43,5 @@ except Exception as e:
     sys.exit(3)
 
 print(output)
+sys.exit(0)
 

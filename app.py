@@ -1,18 +1,22 @@
+import sys
 import flask
 import flask_session
 import markupsafe
 
-## to be moved into config:
+## local imports:
+import config
+import util
 
-config_session_key = 'abc123'
-config_session_type = 'filesystem'
+## init mongodb collection object for config.mongo['collection']; 
+##   then can pass collection object to modules that need it:
 
-## launch and configure flask session:
+mongo_collection = util.get_mongo_collection()
+if not mongo_collection:
+    util.log_email("ERROR: could not connect to collection.")
+    sys.exit(3)
 
+## initialize flask object:
 app = flask.Flask(__name__.split('.')[0])
-app.config['SECRET_KEY'] = config_session_key       ## random/secret key used to sign session info
-app.config['SESSION_TYPE'] = config_session_type    ## mode for storing server-side session properties
-flask_session.Session(app)                          ## make session server-side; set/get properties thru flask.session
 
 #############################################################################################################
 ## ROUTES:
@@ -85,17 +89,29 @@ def info_url(id1):
     else:                               ## submitted parameters thru web page form
         return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
 
+## temporary route for testing purposes:
+@app.route("/test", methods=['GET'])
+def test():
+    output = ''
+    try: 
+        cursor = mongo_collection.find({})
+        for rec in cursor: 
+            output += f"{rec}<br>"
+    except Exception as e:
+        return f"ERROR: find failed: {e}"
+
+    return output
+
 ###########################################################################################
 ## MAIN: 
 
 if __name__.split('.')[0] == '__main__': 
-    ## execute main as 'try' block in order to gracefully handle and report any uncaught exceptions:
+    ## execute as 'try' block to gracefully handle uncaught exceptions:
     try:
-        ## listen to localhost only; ssl w/o certificates; auto refresh http server after code changes:
+        ## listen to localhost only; ssl w/o certificates; auto refresh http server after code edits:
         app.run(host='127.0.0.1', ssl_context='adhoc', debug=True)  
     except Exception as e:
-        ## we will normally log to file and email, but here temporarily we just write to stdout:
-        sys.stderr.write(f"ERROR: uncaught exception of type '{type(e)}': {e}")
-        sys.exit(3)
+        log_email(f"ERROR: uncaught exception of type '{type(e)}': {e}")
+
     sys.exit(0)
 

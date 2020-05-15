@@ -30,4 +30,5 @@ except Exception as e:
     sys.exit(3)
 
 print(output)
+sys.exit(0)
 
