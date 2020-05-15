@@ -36,19 +36,24 @@ except Exception as e:
     sys.stderr.write(f"ERROR: could not select collection '{database}.{collection}': {e}\n")
     sys.exit(4)
 
-## The actual insertion; you can also insert a single record as a dictionary (instead
-##   of as a list of dictionaries), by calling 'insert_one':
+## The actual update; you can also update multiple records in single call w/ update_many():
+condition = {'i like': False}
 try: 
-    curs = col.find({"i like": True})
-    ## if the result set is reasonably small, you can get them all back as a list with:
-    ##   results = list(curs)
-    ## but here we will pretend the list is potentially huge, so need to process 1-by-1:
-    ##   keep inside try, as each iteration requires a server connection (which may fail):
-    for rec in curs:
-        print("next record: ", rec)
+    cursor = col.find(condition, {'_id': 1})
+    count = cursor.count() 
+    if count != 1:
+        raise Exception(f"ERROR: {count} records match condition {condition}.\n")
+    id1 = cursor[0]['_id']      ## '_id' field from 1st record (dict); type(id1): ObjectId
+    result = col.update_one(
+        {'_id': id1},                                             ## match condition
+        {'$set': {'i like': True, 'priceline_spokesman': True},   ## one old field, one new
+         '$unset': {'other works': ''}})                          ## delete a field
+    if not result.acknowledged:
+        raise Exception(f"ERROR: update not acknowledged.")
 except Exception as e:
     sys.stderr.write(f"ERROR: find() failed: {e}\n")
     sys.exit(5)
 
+print(f"successfully changed record w/ _id: {id1}")
 sys.exit(0)
 
