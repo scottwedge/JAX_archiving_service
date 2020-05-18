@@ -71,16 +71,15 @@ def log_email(msg, error=False):
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     filename = getframeinfo(currentframe()).filename
     lineno = inspect.currentframe().f_back.f_lineno
-    log_prefix = (
-        f"[{ts}, {filename}:{lineno}, ERROR]"
-        if error
-        else f"[{ts}, {filename}:{lineno}]"
-    )
+    log_prefix = f"[{ts}, {filename}:{lineno}, "
+    log_prefix += "ERROR]" if error else "INFO]"
     log_msg = f"{log_prefix} {msg}"
     if error:
         sys.stderr.write(f"{log_msg}\n")
         # send_err_email(body)
-    LOGGER.info(log_msg)
+        LOGGER.error(log_msg)
+    else:
+        LOGGER.info(log_msg)
     print(log_msg)
     return
 
