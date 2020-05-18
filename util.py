@@ -9,16 +9,6 @@ import smtplib
 import sys
 
 
-# body = (
-#     f"Hi {user['fname'].capitalize()},\nYour request to {action} {source_path} has "
-#     f"{'completed successfully' if status else 'failed'}.\n"
-# )
-
-
-def test_email_body():
-    return "This is a boring test string for the email.\nIncluding a newline for fun."
-
-
 def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
     msg = MIMEMultipart()
     # Who recipient(s) will see the email is from
@@ -42,29 +32,8 @@ def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
                 LOGGER.error(err_msg)
                 sys.stderr.write(err_msg)
     except Exception as e:
-        LOGGER.debug(f"error sending email: {e}")
+        LOGGER.error(f"error sending email: {e}")
         pass
-
-
-# def send_err_email(body):
-#     send_email(
-#         config.err_email_list,
-#         body,
-#         subject="Archiver Error",
-#         to="Data-Services@jax.org",
-#     )
-#     return
-
-
-# def get_logger(level, msg):
-#     switcher = {
-#         "debug": LOGGER.debug(msg),
-#         "info": LOGGER.info(msg),
-#         "warning": LOGGER.warning(msg),
-#         "error": LOGGER.error(msg),
-#         "critical": LOGGER.critical(msg),
-#     }
-#     switcher.get(level.lower(), f"{level} is not a recognized log level")
 
 
 def log_email(msg, error=False):
@@ -76,12 +45,14 @@ def log_email(msg, error=False):
     log_msg = f"{log_prefix} {msg}"
     if error:
         sys.stderr.write(f"{log_msg}\n")
-        # send_err_email(body)
+        # send_email(
+        #     config.err_email_list,
+        #     body,
+        #     subject="Archiver Error",
+        #     to="Data-Services@jax.org",
+        # )
         LOGGER.error(log_msg)
     else:
         LOGGER.info(log_msg)
     print(log_msg)
     return
-
-
-log_email("This should be an error log message")
