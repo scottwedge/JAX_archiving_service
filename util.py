@@ -15,7 +15,7 @@ import sys
 import config
 
 ## imports conditional on config:
-if config.testing['email_on']: 
+if config.testing['mongo_on']: 
     import pymongo
 else: 
     import mocks.pymongo_mock
