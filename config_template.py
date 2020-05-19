@@ -10,6 +10,7 @@ mongo = {
 
 api_keys = {
     'abc123': {
+        'userid': 'kostim',
         'firstname': 'mitch',
         'lastname': 'kostich',
         'email': 'mitch.kostich@jax.org',

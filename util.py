@@ -1,18 +1,16 @@
 ## unconditional global imports:
 import sys
+import inspect
+import smtplib
+import subprocess
 import urllib.parse
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from inspect import currentframe
-from inspect import getframeinfo
-from logger import LOGGER
-import inspect
-import smtplib
-import sys
 
 ## unconditional local imports:
 import config
+from logger import LOGGER
 
 ## imports conditional on config:
 if config.testing['mongo_on']: 
@@ -84,7 +82,7 @@ def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
 
 def log_email(msg, error=False):
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    filename = getframeinfo(currentframe()).filename
+    filename = inspect.getframeinfo(inspect.currentframe()).filename
     lineno = inspect.currentframe().f_back.f_lineno
     log_prefix = f"[{ts}, {filename}:{lineno}, "
     log_prefix += "ERROR]" if error else "INFO]"
@@ -102,4 +100,26 @@ def log_email(msg, error=False):
         LOGGER.info(log_msg)
     print(log_msg)
     return
+
+def get_api_user(args_dict):
+
+    if not isinstance(args_dict, dict):
+        raise Exception("get_api_user(): args_dict is not a dict.")
+
+    if 'api_key' not in args_dict:
+        raise Exception("get_api_user(): no api key present; unauthorized request.")
+    api_key = args_dict.get('api_key')
+
+    user_info = config.api_keys.get(api_key)
+    if not user_info:
+        raise Exception("get_api_user(): invalid api key.")
+
+    try:
+        groups_string = subprocess.getoutput(f"id -Gn {user_info['userid']}")
+        groups_list = groups_string.split()
+    except Exception as e:
+        raise Exception(f"get_api_user(): could not get groups: {e}")
+
+    user_info['groups_list'] = groups_list
+    return user_info
 
