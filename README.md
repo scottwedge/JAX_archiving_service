@@ -10,7 +10,7 @@
 - [`/archive`][1]
    - [metadata][metadata_link]
 - [`/retrieve`][2]
-- [`/get_collection`][3]
+- [`collection-endpoints`][3]
 - [`/archive_failed`][4]
 - [`/archive_processing`][5]
 - [`/archive_success`][6]
@@ -383,15 +383,15 @@ print(response.json())
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
-[1]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#archive
-[2]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#retrieve
-[3]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#get_collection
-[4]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#archive_failed
-[5]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#archive_processing
-[6]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#archive_success
-[7]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#retrieve_failed
-[8]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#retrieve_processing
-[9]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#retrieve_success
+[1]: #archive
+[2]: #retrieve
+[3]: #collection-endpoints
+[4]: #archive_failed
+[5]: #archive_processing
+[6]: #archive_success
+[7]: #retrieve_failed
+[8]: #retrieve_processing
+[9]: #retrieve_success
 [frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
-[endpoints]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#endpoints
-[metadata_link]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#metadata
+[endpoints]: #endpoints
+[metadata_link]: #metadata
