@@ -1,4 +1,4 @@
-# JAX Archiving Service 
+# JAX Archiving Service
 
 [![N|Solid](https://clic-ctsa.org/sites/default/files/styles/large/public/2019-10/jacksonLabLogo.png)](https://jacksonlaboratory.sharepoint.com/sites/ResearchIT)
 
@@ -43,17 +43,18 @@ The body of the `POST` request must contain the following keys [`api_key`, `meta
 
 A dictionary (in python or equivalent in other language) with the following required keys [`manager_user_id`, `user_id`, `project_name`, `grant_id`, `notes`, `system_groups`, `request_type`]
 -   `manager_user_id` The short username of the principal investigator (PI) owning the data.
--   `user_id` The short username of the person who generated the data. In many cases this is a postdoc. It can be the PI. 
+-   `user_id` The short username of the person who generated the data. In many cases this is a postdoc. It can be the PI.
 -   `project_name` The name of the project the user specifies that the data is associated with.
 -   `grant_id` The grant ID associated with the data. If there is no grant ID, set this to the empty string. The service will recognize the empty string and enter “None_entered_by_user” into mongoDB.
 -   `notes` Any string the user might find useful for locating these archived files at a later date.
 -   *** `system_groups`*** A list in the form of an array of the HPC group(s) that will own the data and/or have permission to access the data on the cluster.
 -   `request_type` A string corresponding to the type of data requesting to be archived [`faculty`, `GT`, `singlecell`, `microscopy`].
+-   `user_metadata` This key is required, however, the value (if any) is specified by the user.
 
 ##### Flow of actions
 1. object_id of mongoDB document is returned as a string
 2. After request is submitted to pbs, metadata is updated with `job_id`, user receives an email notification about request being submitted to the queue.
-3. When pbs starts to process the job it will use the [`/archive_processing`][5] endpoint with the `job_id`. 
+3. When pbs starts to process the job it will use the [`/archive_processing`][5] endpoint with the `job_id`.
    - This will notify user and update metadata.
 4. When the job is completed, pbs will use the [`/archive_success`][6] endpoint with `job_id`, `sourceSize` and `archivedSize`
    - This will notify user and update metadata.
@@ -106,7 +107,7 @@ The body of the `POST` will contain the following keys [`api_key`, `requested_di
 ##### Flow of retrieve actions
 1. integer value corresponding to the number of directories submitted for retrieval is returned.
 2. After request is submitted to pbs, metadata is updated with `job_id`, user receives an email notification about request being submitted to the queue.
-3. When pbs starts to process the retrieve job it will use the `retrieve_processing` endpoint with the `job_id`. 
+3. When pbs starts to process the retrieve job it will use the `retrieve_processing` endpoint with the `job_id`.
    - This will notify user and update metadata.
 4. When the retrieve job is completed, pbs will use the `retrieve_success` endpoint with `job_id`.
    - This will notify user and update metadata.
@@ -134,7 +135,7 @@ print(response.text.encode('utf8'))
 print(response.json())
 ```
 ---
-### /get_collection 
+### /get_collection
 (***To Be Redesigned***)
 [back to top][endpoints]
 
