@@ -10,7 +10,10 @@
 - [`/archive`][1]
    - [metadata][metadata_link]
 - [`/retrieve`][2]
-- [`/get_collection`][3]
+- [collection-endpoints][3]
+   - [`/get_documents`][10]
+   - [`/get_document_by_id`][11]
+   - [`/get_last_document`][12]
 - [`/archive_failed`][4]
 - [`/archive_processing`][5]
 - [`/archive_success`][6]
@@ -136,23 +139,52 @@ print(response.text.encode('utf8'))
 print(response.json())
 ```
 ---
-### /get_collection
-(***To Be Redesigned***)
+## collection endpoints
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be a mongoDB collection of documents. This endpoint is primarily to be used by the [archive frontend][frontend].
+These endpoints will accept a `GET` request as described below. These endpoints will primarily be used by the [archive frontend][frontend].
 
-This `GET` will include two args `api_key` and `gold`
+### /get_documents
+
+The return value is a list of documents specified by the args. This `GET` will include four args `api_key`, `find`, `limit` and `last`.
 - `api_key`
    - Value is the string representing the key
-- `gold`
-   - boolean, `true` for permanently archived metadata, `false` for operational metadata
+- `find`
+   - dict with key,value pair used to filter results in collection. In most cases the value of this dict will be `{"archival_status": "completed"}`
+- `limit`
+  - integer corresponding to the number of documents to limit the return to. In most cases this will be `100`.
+- `last`
+  - the `object id` of the last `limit` number documents after sorting.
+
+
+### /get_document_by_objectid
+
+The return value is the document corresponding to the specified `object_id`. This `GET` will include two args `api_key` and `object_id`.
+- `api_key`
+   - Value is the string representing the key
+- `object_id`
+   - string value of the object id you want to query
+
+
+### /get_last_document
+
+The return value is the last document in the mongoDB collection. This `GET` will include one arg `api_key`.
+- `api_key`
+   - Value is the string representing the key
+
 
 #### example of `GET` request in python
 ```
 import requests
 
-url = "https://ctdataservices-prod01lp.jax.org/api/archiving/get_collection?api_key=KEY&gold=true"
+# get_documents
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/get_documents?api_key=KEY&find={\"archival_status\":\"completed\"}&limit=null&last=null"
+
+# get_document_by_objectid
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/get_document_by_objectid?api_key=KEY&_id=5ac0cafa824137ec055665b9"
+
+# get_last_document
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/get_last_document?api_key=KEY"
 
 payload = {}
 headers= {}
@@ -369,15 +401,18 @@ print(response.json())
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
-[1]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#archive
-[2]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#retrieve
-[3]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#get_collection
-[4]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#archive_failed
-[5]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#archive_processing
-[6]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#archive_success
-[7]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#retrieve_failed
-[8]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#retrieve_processing
-[9]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#retrieve_success
+[1]: #archive
+[2]: #retrieve
+[3]: #collection-endpoints
+[4]: #archive_failed
+[5]: #archive_processing
+[6]: #archive_success
+[7]: #retrieve_failed
+[8]: #retrieve_processing
+[9]: #retrieve_success
+[10]: #get_documents
+[11]: #get_document_by_objectid
+[12]: #get_last_document
 [frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
-[endpoints]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#endpoints
-[metadata_link]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#metadata
+[endpoints]: #endpoints
+[metadata_link]: #metadata
