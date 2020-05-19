@@ -11,6 +11,9 @@
    - [metadata][metadata_link]
 - [`/retrieve`][2]
 - [`collection-endpoints`][3]
+   - [/get_documents][10]
+   - [/get_document_by_id][11]
+   - [/get_last_document][12]
 - [`/archive_failed`][4]
 - [`/archive_processing`][5]
 - [`/archive_success`][6]
@@ -392,6 +395,9 @@ print(response.json())
 [7]: #retrieve_failed
 [8]: #retrieve_processing
 [9]: #retrieve_success
+[10]: #get_documents
+[11]: #get_document_by_objectid
+[12]: #get_last_document
 [frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
 [endpoints]: #endpoints
 [metadata_link]: #metadata
