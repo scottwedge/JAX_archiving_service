@@ -175,9 +175,24 @@ The return value is the last document in the mongoDB collection. This `GET` will
 
 #### example of `GET` request in python
 ```
-Coming soon
+import requests
 
+# get_documents
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/get_documents?api_key=KEY&find={\"archival_status\":\"completed\"}&limit=null&last=null"
 
+# get_document_by_objectid
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/get_document_by_objectid?api_key=KEY&_id=5ac0cafa824137ec055665b9"
+
+# get_last_document
+url = "https://ctdataservices-prod01lp.jax.org/api/archiving/get_last_document?api_key=KEY"
+
+payload = {}
+headers= {}
+
+response = requests.request("GET", url, headers=headers, data=payload, verify=False)
+
+print(response.text.encode('utf8'))
+print(response.json())
 ```
 ---
 ### /archive_failed
