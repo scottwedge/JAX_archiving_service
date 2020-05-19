@@ -136,31 +136,45 @@ print(response.text.encode('utf8'))
 print(response.json())
 ```
 ---
-### /get_collection
-(***To Be Redesigned***)
+## collection endpoints
 [back to top][endpoints]
 
-This endpoint will accept a `GET` request as described below. The successful return will be a mongoDB collection of documents. This endpoint is primarily to be used by the [archive frontend][frontend].
+These endpoints will accept a `GET` request as described below. These endpoints will primarily be used by the [archive frontend][frontend].
 
-This `GET` will include two args `api_key` and `gold`
+### /get_documents
+
+The return value is a list of documents specified by the args. This `GET` will include four args `api_key`, `find`, `limit` and `last`.
 - `api_key`
    - Value is the string representing the key
-- `gold`
-   - boolean, `true` for permanently archived metadata, `false` for operational metadata
+- `find`
+   - dict with key,value pair used to filter results in collection. In most cases the value of this dict will be `{"archival_status": "completed"}`
+- `limit`
+  - integer corresponding to the number of documents to limit the return to. In most cases this will be `100`.
+- `last`
+  - the `object id` of the last `limit` number documents after sorting.
+
+
+### /get_document_by_objectid
+
+The return value is the document corresponding to the specified `object_id`. This `GET` will include two args `api_key` and `object_id`.
+- `api_key`
+   - Value is the string representing the key
+- `object_id`
+   - string value of the object id you want to query
+
+
+### /get_last_document
+
+The return value is the last document in the mongoDB collection. This `GET` will include one arg `api_key`.
+- `api_key`
+   - Value is the string representing the key
+
 
 #### example of `GET` request in python
 ```
-import requests
+Coming soon
 
-url = "https://ctdataservices-prod01lp.jax.org/api/archiving/get_collection?api_key=KEY&gold=true"
 
-payload = {}
-headers= {}
-
-response = requests.request("GET", url, headers=headers, data=payload, verify=False)
-
-print(response.text.encode('utf8'))
-print(response.json())
 ```
 ---
 ### /archive_failed
