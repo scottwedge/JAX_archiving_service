@@ -379,5 +379,5 @@ print(response.json())
 [8]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#retrieve_processing
 [9]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#retrieve_success
 [frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
-[endpoints]: https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/JAX_Archiving_Service_API_docs.md#endpoints
+[endpoints]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#endpoints
 [metadata_link]: https://github.com/TheJacksonLaboratory/JAX_archiving_service#metadata
