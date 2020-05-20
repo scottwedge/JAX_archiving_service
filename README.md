@@ -77,7 +77,6 @@ Example of metadata when archiving is processing
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
     "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_submit": false,
- ***"when_submitted": "2019-12-31 22:41:00 EDT-0400",***
     "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
     "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
 	"when_archival_completed": "2020-01-01 03:01:59 EDT-0400",
