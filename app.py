@@ -6,6 +6,7 @@ import markupsafe
 ## local imports:
 import config
 import util
+import status_updater
 
 ## init mongodb collection object for config.mongo['collection']; 
 ##   then can pass collection object to modules that need it:
@@ -39,8 +40,18 @@ def retrieve_url():
 
 @app.route("/archive_failed", methods=['GET'])
 def archive_failed_url():
-    url = "/archive_failed"
-    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        value = status_updater.archive_failed(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /archive_failed: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
+
 
 @app.route("/archive_processing", methods=['GET'])
 def archive_processing_url():
@@ -48,10 +59,9 @@ def archive_processing_url():
     try:
         args = dict(flask.request.args)
         user_dict = util.get_api_user(args)
-        return user_dict
-        ## value = status_updater.archive_processing(args, user_dict, mongo_collection)
+        value = status_updater.archive_processing(args, user_dict, mongo_collection)
     except Exception as e:
-        msg = f"ERROR: /archive_processing exception: {e}"
+        msg = f"ERROR: from /archive_processing: {e}"
         util.log_email(msg, error=True)
         return msg
 
@@ -60,25 +70,79 @@ def archive_processing_url():
 
 @app.route("/archive_success", methods=['GET'])
 def archive_success_url():
-    url = "/archive_success"
-    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        value = status_updater.archive_success(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /archive_success: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
 
 
 @app.route("/retrieve_failed", methods=['GET'])
 def retrieve_failed_url():
-    url = "/retrieve_failed"
-    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        value = status_updater.retriev_failed(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /retrieve_failed: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
 
 
 @app.route("/retrieve_processing", methods=['GET'])
 def retrieve_processing_url():
-    url = "/retrieve_processing"
-    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        value = status_updater.retrieve_processing(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /retrieve_processing: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
 
 
 @app.route("/retrieve_success", methods=['GET'])
 def retrieve_success_url():
-    url = "/retrieve_success"
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        value = status_updater.retrieve_success(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /retrieve_success: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
+
+
+@app.route("/get_documents", methods=['GET'])
+def get_documents():
+    url = "/get_documents"
+    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+
+
+@app.route("/get_document_by_objectid", methods=['GET'])
+def get_document_by_objectid():
+    url = "/get_document_by_objectid"
+    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+
+
+@app.route("/get_last_document", methods=['GET'])
+def get_last_document():
+    url = "/get_last_document"
     return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
 
 
@@ -92,6 +156,7 @@ def root_url():
         return f"ERROR: POST reached unimplemented route '{url}'; args: '{flask.request.json}'"
     else:                               ## submitted parameters thru web page form
         return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
+
 
 ## for now, just for testing/demo flask:
 @app.route("/info/<id1>", methods=['GET', 'POST'])
