@@ -55,6 +55,86 @@ A dictionary (in python or equivalent in other language) with the following requ
 -   `request_type` A string corresponding to the type of data requesting to be archived [`faculty`, `GT`, `singlecell`, `microscopy`].
 -   `user_metadata` This key is required, however, the value (if any) is specified by the user.
 
+---
+Example of metadata when archiving is processing
+```
+{
+    "managerUserId": "pi",
+    "userId": "postdoc",
+    "projectName": "Nobel Prize Project (NPP)",
+    "classification": "topSecret",
+    "grant_id": "NA",
+    "notes": "what are notes?",
+    "request_type": "faculty",
+    "system_groups": ["jaxuser"],
+    "submitter": {
+        "fname": "post",
+        "lname": "doc",
+        "username": "pdoc",
+        "group": "science-lab",
+        "email": "post.doc@jax.org"
+    },
+    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
+    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "ready_for_submit": false,
+ ***"when_submitted": "2019-12-31 22:41:00 EDT-0400",***
+    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
+	"when_archival_completed": "2020-01-01 03:01:59 EDT-0400",
+    "failed_multiple": null,
+    "archival_status": "completed",
+    "job_id": "8638.ctarchive.jax.org",
+    "submit_progress": [],
+    "archivedSize": {
+        "$numberInt": "396700549"
+    },
+    "dateArchived": "2020-01-01",
+    "sourceSize": {
+        "$numberInt": "797725536"
+    },
+	"user_metadata":{}
+}
+```
+---
+Example of metadata when archiving is completed
+```
+{
+    "managerUserId": "pi",
+    "userId": "postdoc",
+    "projectName": "Nobel Prize Project (NPP)",
+    "classification": "topSecret",
+    "grant_id": "NA",
+    "notes": "what are notes?",
+    "request_type": "faculty",
+    "system_groups": ["jaxuser"],
+    "submitter": {
+        "fname": "post",
+        "lname": "doc",
+        "username": "pdoc",
+        "group": "science-lab",
+        "email": "post.doc@jax.org"
+    },
+    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
+    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "archival_status": "completed",
+    "submit_progress": [],
+    "archivedSize": {
+        "$numberInt": "396700549"
+    },
+    "dateArchived": "2020-05-19",
+    "sourceSize": {
+        "$numberInt": "797725536"
+    },
+	"user_metadata":{},
+    "submission": {
+        "job_id": "8638.ctarchive.jax.org",
+        "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+        "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
+        "when_archival_completed": "2020-01-01 03:01:59 EDT-0400"
+    }
+}
+```
+
 ##### Flow of actions
 1. object_id of mongoDB document is returned as a string
 2. After request is submitted to pbs, metadata is updated with `job_id`, user receives an email notification about request being submitted to the queue.
