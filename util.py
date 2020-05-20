@@ -80,45 +80,52 @@ def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
         pass
 
 
-def log_email(msg, error=False):
+def gen_msg(msg, error=True):
+
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    filename = inspect.getframeinfo(inspect.currentframe()).filename
-    lineno = inspect.currentframe().f_back.f_lineno
-    log_prefix = f"[{ts}, {filename}:{lineno}, "
-    log_prefix += "ERROR]" if error else "INFO]"
-    log_msg = f"{log_prefix} {msg}"
+    frame = inspect.currentframe()
+    filename = inspect.getframeinfo(frame).filename.split('/')[-1]
+    lineno = frame.f_back.f_lineno
+    prefix = f"[{ts}, {filename}:{lineno}, "
+    prefix += "ERROR]" if error else "INFO]"
+    return f"{prefix} {msg}"
+
+
+def log_email(msg, error=False):
+
     if error:
-        sys.stderr.write(f"{log_msg}\n")
+        sys.stderr.write(f"{msg}\n")
         # send_email(
         #     config.err_email_list,
         #     body,
         #     subject="Archiver Error",
         #     to="Data-Services@jax.org",
         # )
-        LOGGER.error(log_msg)
+        LOGGER.error(msg)
     else:
-        LOGGER.info(log_msg)
-    print(log_msg)
+        LOGGER.info(msg)
+    print(msg)
     return
+
 
 def get_api_user(args_dict):
 
     if not isinstance(args_dict, dict):
-        raise Exception("get_api_user(): args_dict is not a dict.")
+        raise Exception(gen_msg("args_dict is not a dict."))
 
     if 'api_key' not in args_dict:
-        raise Exception("get_api_user(): no api key present; unauthorized request.")
+        raise Exception(gen_msg("no api key present; unauthorized request."))
     api_key = args_dict.get('api_key')
 
     user_info = config.api_keys.get(api_key)
     if not user_info:
-        raise Exception("get_api_user(): invalid api key.")
+        raise Exception(gen_msg("invalid api key"))
 
     try:
         groups_string = subprocess.getoutput(f"id -Gn {user_info['userid']}")
         groups_list = groups_string.split()
     except Exception as e:
-        raise Exception(f"get_api_user(): could not get groups: {e}")
+        raise Exception(gen_msg(f"could not get groups: {e}"))
 
     user_info['groups_list'] = groups_list
     return user_info
