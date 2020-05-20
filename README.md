@@ -390,7 +390,7 @@ print(response.json())
 
 This endpoint will accept a `GET` request as described below. This endpoint is used by internal components only to update the metadata with the the current status of `completed` and notify the user that their files were successfully deposited into the archive.
 
-The successful return will be the `gold_document` (a python dictionary) containning the metadata. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status`, `when_archival_completed`, `sourceSize`, `archivewdSize` and `dateArchived` with `"processing"` and `{timestamp}` respectively. The user will be sent an email notification about the successfully completed job.
+The successful return will be the `gold_document` (a python dictionary) containing the metadata. The metadata document associated with the `job_id` will be updated. The keys to update are `archival_status`, `when_archival_completed`, `sourceSize`, `archivewdSize` and `dateArchived` with `"success"` and `{timestamp}` respectively. The user will be sent an email notification about the successfully completed job.
 
 The unsuccessful return of this endpoint will be a string (starting with `ERROR:`) describing why the workflow of this endpoint did not fully complete successfully.
 
