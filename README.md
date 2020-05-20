@@ -81,7 +81,8 @@ payload = "{
             "jaxuser",
             "researchit"
         ],
-        "request_type": "singlecell"
+        "request_type": "singlecell",
+        "user_metadata":{}
     },
     "source_folder": "/projects/researchit/nanozoomer_stage",
     "service_path": "some/path/user/wants"
