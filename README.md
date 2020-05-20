@@ -92,7 +92,7 @@ Example of metadata when archiving is processing
     "sourceSize": {
         "$numberInt": "797725536"
     },
-	"user_metadata":{}
+    "user_metadata":{}
 }
 ```
 ---
@@ -124,7 +124,7 @@ Example of metadata when archiving is completed
     "sourceSize": {
         "$numberInt": "797725536"
     },
-	"user_metadata":{},
+    "user_metadata":{},
     "submission": {
         "job_id": "8638.ctarchive.jax.org",
         "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
@@ -195,10 +195,10 @@ Example of metadata while retrieve processing
 ```
 {
 	"current_user": {
-		"fname": "Research",
-        "lname": "IT",
-        "username": "rit",
-        "email": "rit@jax.org"
+    "fname": "Research",
+    "lname": "IT",
+    "username": "rit",
+    "email": "rit@jax.org"
 	},
     "managerUserId": "pi",
     "userId": "postdoc",
@@ -225,7 +225,7 @@ Example of metadata while retrieve processing
     "sourceSize": {
         "$numberInt": "797725536"
     },
-	"user_metadata":{},
+    "user_metadata":{},
     "submission": {
         "job_id": "8638.ctarchive.jax.org",
         "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
