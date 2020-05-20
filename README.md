@@ -348,6 +348,10 @@ This `GET` will include two args, `api_key` and `job_id`.
 - `job_id`
    - Value is a string representing the `job_id` of the failed job.
 
+---
+Example of [metadata][metadata_archive_failed] state after this endpoint updates the metadata
+
+
 #### Example `GET` request in python
 ```
 import requests
@@ -564,3 +568,4 @@ print(response.json())
 [metadata_archive_queued]: metadata.md#metadata-archive-queued
 [metadata_archive_processing]: metadata.md#metadata-archive-processing
 [metadata_archive_completed]: metadata.md#metadata-archive-completed
+[metadata_archive_failed]: metadata.md#metadata-archive-failed

@@ -109,6 +109,42 @@ Example of metadata when archiving is completed
 
 Back to [`/archive_success`][6]
 
+---
+
+#### Metadata archive failed
+Example of metadata state when `/archive_failed` updates metadata. Note that metadata state can look different from example below depending on what stage of archiving process the failure happens.
+```
+{
+    "managerUserId": "pi",
+    "userId": "postdoc",
+    "projectName": "Nobel Prize Project (NPP)",
+    "classification": "topSecret",
+    "grant_id": "NA",
+    "notes": "Who needs notes?",
+    "request_type": "faculty",
+    "system_groups": ["jaxuser"],
+    "submitter": {
+        "fname": "post",
+        "lname": "doc",
+        "username": "pdoc",
+        "group": "science-lab",
+        "email": "post.doc@jax.org"
+    },
+    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
+    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "ready_for_submit": false,
+    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
+    "when_archival_failed": "2019-12-31 22:46:08 EDT-0400",
+    "when_archival_completed": null,
+    "failed_multiple": null,
+    "archival_status": "failed",
+    "user_metadata":{}
+}
+```
+
+Back to [`/archive_failed`][4]
+
 
 
 [1]: README.md#archive
