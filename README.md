@@ -111,7 +111,6 @@ Example of metadata when archiving is completed
         "fname": "post",
         "lname": "doc",
         "username": "pdoc",
-        "group": "science-lab",
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
@@ -188,6 +187,54 @@ The body of the `POST` will contain the following keys [`api_key`, `requested_di
    - Value is the string representing the key
 - `requested_dirs`
    - Value is a list where each item in the list is a string representation of the `object_id` for the metadata document associated with the archived directory requesting to be retrieved.
+---
+#### Retrieval Current User
+To keep track of the user, the user info for the `api_key` holder will be temporarily entered into the metadata so that the email associated with an `api_key` will receive the email notifications. The key with this current user is `current_user`.
+
+Example of metadata while retrieve processing
+```
+{
+	"current_user": {
+		"fname": "Research",
+        "lname": "IT",
+        "username": "rit",
+        "email": "rit@jax.org"
+	},
+    "managerUserId": "pi",
+    "userId": "postdoc",
+    "projectName": "Nobel Prize Project (NPP)",
+    "classification": "topSecret",
+    "grant_id": "NA",
+    "notes": "what are notes?",
+    "request_type": "faculty",
+    "system_groups": ["jaxuser"],
+    "submitter": {
+        "fname": "post",
+        "lname": "doc",
+        "username": "pdoc",
+        "email": "post.doc@jax.org"
+    },
+    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
+    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "archival_status": "completed",
+    "submit_progress": [],
+    "archivedSize": {
+        "$numberInt": "396700549"
+    },
+    "dateArchived": "2020-05-19",
+    "sourceSize": {
+        "$numberInt": "797725536"
+    },
+	"user_metadata":{},
+    "submission": {
+        "job_id": "8638.ctarchive.jax.org",
+        "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+        "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
+        "when_archival_completed": "2020-01-01 03:01:59 EDT-0400"
+    }
+}
+```
+
 
 ##### Flow of retrieve actions
 1. integer value corresponding to the number of directories submitted for retrieval is returned.
