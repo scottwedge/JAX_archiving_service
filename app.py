@@ -30,6 +30,7 @@ def archive_url():
     else:                               ## submitted parameters thru web page form
         return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
 
+
 @app.route("/retrieve", methods=['POST'])
 def retrieve_url():
     url = "/retrieve"
@@ -37,6 +38,7 @@ def retrieve_url():
         return f"ERROR: POST reached unimplemented route '{url}'; args: '{flask.request.json}'"
     else:                               ## submitted parameters thru web page form
         return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
+
 
 @app.route("/archive_failed", methods=['GET'])
 def archive_failed_url():
@@ -168,6 +170,7 @@ def info_url(id1):
         return f"ERROR: POST reached unimplemented route '{url}'; args: '{flask.request.json}'"
     else:                               ## submitted parameters thru web page form
         return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
+
 
 ## temporary route for testing purposes:
 @app.route("/test", methods=['GET'])

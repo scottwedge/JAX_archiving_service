@@ -1,5 +1,7 @@
 ## unconditional global imports:
 import sys
+import datetime
+import pytz
 import inspect
 import smtplib
 import subprocess
@@ -17,6 +19,20 @@ if config.testing['mongo_on']:
     import pymongo
 else: 
     import mocks.pymongo_mock
+
+
+def get_timestamp(format=config.time['format_sec'], zone=config.time['zone']):
+    """
+    Returns a timestamp (str) with the current time.
+    Argument(s):
+      format: time format str
+      zone: time zone str
+    Value: str containing the current datetime
+    """
+
+    zone = pytz.timezone(zone)
+    ts = zone.localize(datetime.datetime.now())
+    return ts.strftime(format)
     
 
 def get_mongo_client():
