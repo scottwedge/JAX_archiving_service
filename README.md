@@ -56,6 +56,7 @@ A dictionary (in python or equivalent in other language) with the following requ
 -   `user_metadata` This key is required, however, the value (if any) is specified by the user.
 
 ---
+#### Example Metadata
 Example of metadata when archiving is processing
 ```
 {
