@@ -231,7 +231,26 @@ Example of metadata while retrieve processing
         "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
         "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
         "when_archival_completed": "2020-01-01 03:01:59 EDT-0400"
-    }
+    },
+    "retrievals": [{
+    "job_id": "6404.ctarchive.jax.org",
+    "retrieval_status": "failed",
+    "when_retrieval_queued": "2020-03-30 12:32:14 EDT-0400",
+    "when_retrieval_started": "2020-03-30 12:32:15 EDT-0400",
+    "when_retrieval_completed": null
+}, {
+    "job_id": "6406.ctarchive.jax.org",
+    "retrieval_status": "completed",
+    "when_retrieval_queued": "2020-03-30 13:48:41 EDT-0400",
+    "when_retrieval_started": "2020-03-30 13:48:43 EDT-0400",
+    "when_retrieval_completed": "2020-03-30 14:12:21 EDT-0400"
+}, {
+    "job_id": "6628.ctarchive.jax.org",
+    "retrieval_status": "completed",
+    "when_retrieval_queued": "2020-05-12 16:25:31 EDT-0400",
+    "when_retrieval_started": "2020-05-12 16:25:32 EDT-0400",
+    "when_retrieval_completed": "2020-05-12 17:54:42 EDT-0400"
+    }]
 }
 ```
 
