@@ -30,8 +30,45 @@ Example of metadata when initially inserted into mongoDB
     "user_metadata":{}
 }
 ```
-Back to [archive][1]
+
+Back to [archive][metadata_link]
+
 ---
+#### Metadata archive processing
+Example of metadata state when `/archive_processing` updates metadata
+```
+{
+    "managerUserId": "pi",
+    "userId": "postdoc",
+    "projectName": "Nobel Prize Project (NPP)",
+    "classification": "topSecret",
+    "grant_id": "NA",
+    "notes": "Who needs notes?",
+    "request_type": "faculty",
+    "system_groups": ["jaxuser"],
+    "submitter": {
+        "fname": "post",
+        "lname": "doc",
+        "username": "pdoc",
+        "group": "science-lab",
+        "email": "post.doc@jax.org"
+    },
+    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
+    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "ready_for_submit": false,
+    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
+    "when_archival_completed": null,
+    "failed_multiple": null,
+    "archival_status": "processing",
+    "user_metadata":{}
+}
+```
+
+Back to [`/archive_processing`][5]
+
+---
+
 #### Metadata archive completed
 Example of metadata when archiving is completed
 ```
@@ -69,6 +106,8 @@ Example of metadata when archiving is completed
     }
 }
 ```
+
+Back to [`/archive_success`][6]
 
 
 

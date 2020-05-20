@@ -56,7 +56,7 @@ A dictionary (in python or equivalent in other language) with the following requ
 -   `user_metadata` This key is required, however, the value (if any) is specified by the user.
 
 ---
-#### Example Metadata
+#### Example Metadata Queued
 Example of [metadata][metadata_queued] when initially inserted into mongoDB
 ```
 {
@@ -380,35 +380,8 @@ This `GET` will include two args, `api_key` and `job_id`.
    - Value is a string representing the `job_id` of the failed job.
 
 ---
-Example of metadata state after this endpoint updates the metadata
-```
-{
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
-    "classification": "topSecret",
-    "grant_id": "NA",
-    "notes": "Who needs notes?",
-    "request_type": "faculty",
-    "system_groups": ["jaxuser"],
-    "submitter": {
-        "fname": "post",
-        "lname": "doc",
-        "username": "pdoc",
-        "group": "science-lab",
-        "email": "post.doc@jax.org"
-    },
-    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
-    "ready_for_submit": false,
-    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
-    "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
-    "when_archival_completed": null,
-    "failed_multiple": null,
-    "archival_status": "processing",
-    "user_metadata":{}
-}
-```
+Example of [metadata][metadata_archive_processing] state after this endpoint updates the metadata
+
 
 #### Example `GET` request in python
 ```
@@ -445,34 +418,8 @@ This `GET` will include four args, `api_key` and `job_id`.
 - `archivedSize`
    - Integer corresponding to the final size of the archived files.
 
----
-Example of metadata state after this endpoint updates the metadata. Note that some keys were deleted. Some of these k,v pairs will be nested in a new key called `submission`. An example of the final state of the metadata is [here][example_metadata].
-```
-{
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
-    "classification": "topSecret",
-    "grant_id": "NA",
-    "notes": "Who needs notes?",
-    "request_type": "faculty",
-    "system_groups": ["jaxuser"],
-    "submitter": {
-        "fname": "post",
-        "lname": "doc",
-        "username": "pdoc",
-        "group": "science-lab",
-        "email": "post.doc@jax.org"
-    },
-    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
-    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
-    "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
-    "when_archival_completed": "2019-12-31 22:42:02 EDT-0400",
-    "archival_status": "completed",
-    "user_metadata":{}
-}
-```
+ ---
+ Example of [metadata][metadata_archive_completed] state after this endpoint updates the metadata
 
 #### Example `GET` request in python
 ```
@@ -613,5 +560,7 @@ print(response.json())
 [frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
 [endpoints]: #endpoints
 [metadata_link]: #metadata
-[example_metadata]: #example-metadata
-[metadata_queued]: metadata.md#metadata-archive-queued
+<!-- [example_metadata_queued]: #example-metadata-queued -->
+[metadata_archive_queued]: metadata.md#metadata-archive-queued
+[metadata_archive_processing]: metadata.md#metadata-archive-processing
+[metadata_archive_completed]: metadata.md#metadata-archive-completed
