@@ -57,7 +57,7 @@ A dictionary (in python or equivalent in other language) with the following requ
 
 ---
 #### Example Metadata
-Example of metadata when initially inserted into mongoDB
+Example of [metadata][metadata_queued] when initially inserted into mongoDB
 ```
 {
     "managerUserId": "pi",
@@ -614,3 +614,4 @@ print(response.json())
 [endpoints]: #endpoints
 [metadata_link]: #metadata
 [example_metadata]: #example-metadata
+[metadata_queued]: metadata.md#metadata-archive-queued
