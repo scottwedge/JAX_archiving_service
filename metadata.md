@@ -101,7 +101,7 @@ Example of metadata when initially inserted into mongoDB
 }
 ```
 
-Back to [archive][metadata_link]
+Back to [`/archive_queued`][14]
 
 ---
 #### Metadata archive processing
@@ -314,6 +314,8 @@ Example of metadata when request ready for submission to pbs
 }
 ```
 
+Back to [`/retrieve`][2]
+
 ---
 
 #### Metadata retrieve queued
@@ -369,6 +371,8 @@ Example of metadata after request successfully queued
 	}]
 }
 ```
+
+Back to [`/retrieve_queued`][13]
 
 ---
 
@@ -426,10 +430,12 @@ Example of metadata after job begins processing
 }
 ```
 
+Back to [`/retrieve_processing`][8]
+
 ---
 
-#### Metadata retrieve processing
-Example of metadata after job begins processing
+#### Metadata retrieve success
+Example of metadata after retrieve job completes
 ```
 {
     "managerUserId": "pi",
@@ -475,6 +481,8 @@ Example of metadata after job begins processing
 	}]
 }
 ```
+
+Back to [`/retrieve_success`][9]
 
 ---
 
@@ -531,6 +539,8 @@ Example of metadata when retrieval fails
 }
 ```
 
+Back to [`/retrieve_failed`][7]
+
 ---
 
 
@@ -546,6 +556,8 @@ Example of metadata when retrieval fails
 [10]: README.md#get_documents
 [11]: README.md#get_document_by_objectid
 [12]: README.md#get_last_document
+[13]: README.md#retrieve_queued
+[14]: README.md#archive_queued
 [frontend]: https://github.com/TheJacksonLaboratory/archive-frontend
 [endpoints]: README.md#endpoints
 [metadata_link]: README.md#metadata
