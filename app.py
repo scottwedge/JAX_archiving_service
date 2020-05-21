@@ -40,6 +40,23 @@ def retrieve_url():
         return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
 
 
+@app.route("/archive_queued", methods=['GET'])
+def archive_queued_url():
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        if not user_dict.get('admin'):
+            raise Exception("/archive_queued is only available to admins.")
+        value = status_updater.archive_queued(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /archive_queued: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
+
+
 @app.route("/archive_processing", methods=['GET'])
 def archive_processing_url():
 
@@ -85,6 +102,23 @@ def archive_failed_url():
         value = status_updater.archive_failed(args, user_dict, mongo_collection)
     except Exception as e:
         msg = f"ERROR: from /archive_failed: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
+
+
+@app.route("/retrieve_queued", methods=['GET'])
+def retrieve_queued_url():
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        if not user_dict.get('admin'):
+            raise Exception("/retrieve_queued is only available to admins.")
+        value = status_updater.retrieve_queued(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /retrieve_queued: {e}"
         util.log_email(msg, error=True)
         return msg
 

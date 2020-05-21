@@ -33,6 +33,13 @@ import config
 import util
 
 ########################################################################################
+## /archive_queued:
+
+def archive_queued(args, user_dict, mongo_collection):
+    return user_dict
+
+
+########################################################################################
 ## /archive_processing:
 
 def archive_processing(args, user_dict, mongo_collection):
@@ -302,6 +309,12 @@ def archive_failed(args, user_dict, mongo_collection):
         raise Exception(util.gen_msg("MongoDB update on _id '{id1}' not acknowledged."))
 
     return job_id
+
+########################################################################################
+## /retrieve_queued:
+
+def retrieve_queued(args, user_dict, mongo_collection):
+    return user_dict
 
 
 ########################################################################################
