@@ -34,33 +34,16 @@ Before archive_processing() is called, record looks like:
 
 def archive_processing(args, user_dict, mongo_collection):
     '''
-    {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
-    "classification": "topSecret",
-    "grant_id": "NA",
-    "notes": "Who needs notes?",
-    "request_type": "faculty",
-    "system_groups": ["jaxuser"],
-    "submitter": {
-        "fname": "post",
-        "lname": "doc",
-        "username": "pdoc",
-        "group": "science-lab",
-        "email": "post.doc@jax.org"
-    },
-    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_submit": false,
     "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
     "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
     "when_archival_completed": null,
     "failed_multiple": null,
     "archival_status": "processing",
-    "user_metadata":{}
-    }
     '''
+    if 'job_id' not in args:
+        raise Exception(util.gen_msg("No job_id passed."))
+    
     return user_dict
 
 
@@ -73,23 +56,6 @@ def archive_processing(args, user_dict, mongo_collection):
 
 def archive_success(args, user_dict, mongo_collection):
     '''
-    {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
-    "classification": "topSecret",
-    "grant_id": "NA",
-    "notes": "Who needs notes?",
-    "request_type": "faculty",
-    "system_groups": ["jaxuser"],
-    "submitter": {
-        "fname": "post",
-        "lname": "doc",
-        "username": "pdoc",
-        "email": "post.doc@jax.org"
-    },
-    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "archival_status": "completed",
     "archivedSize": {
         "$numberInt": "396700549"
@@ -98,14 +64,12 @@ def archive_success(args, user_dict, mongo_collection):
     "sourceSize": {
         "$numberInt": "797725536"
     },
-    "user_metadata":{},
     "submission": {
         "job_id": "8638.ctarchive.jax.org",
         "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
         "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
         "when_archival_completed": "2020-01-01 03:01:59 EDT-0400"
     }
-    }  
     '''
     return user_dict
 
@@ -115,6 +79,15 @@ def archive_success(args, user_dict, mongo_collection):
 ##   when_archival_failed -> e.g. ??????:
 
 def archive_failed(args, user_dict, mongo_collection):
+    '''
+    "ready_for_submit": false,
+    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
+    "when_archival_failed": "2019-12-31 22:46:08 EDT-0400",
+    "when_archival_completed": null,
+    "failed_multiple": null,
+    "archival_status": "failed",
+    '''
     return user_dict
 
 

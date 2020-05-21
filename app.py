@@ -40,21 +40,6 @@ def retrieve_url():
         return f"ERROR: POST reached unimplemented route '{url}'; args: '{dict(flask.request.form)}'"
 
 
-@app.route("/archive_failed", methods=['GET'])
-def archive_failed_url():
-
-    try:
-        args = dict(flask.request.args)
-        user_dict = util.get_api_user(args)
-        value = status_updater.archive_failed(args, user_dict, mongo_collection)
-    except Exception as e:
-        msg = f"ERROR: from /archive_failed: {e}"
-        util.log_email(msg, error=True)
-        return msg
-
-    return value
-
-
 @app.route("/archive_processing", methods=['GET'])
 def archive_processing_url():
 
@@ -85,15 +70,15 @@ def archive_success_url():
     return value
 
 
-@app.route("/retrieve_failed", methods=['GET'])
-def retrieve_failed_url():
+@app.route("/archive_failed", methods=['GET'])
+def archive_failed_url():
 
     try:
         args = dict(flask.request.args)
         user_dict = util.get_api_user(args)
-        value = status_updater.retriev_failed(args, user_dict, mongo_collection)
+        value = status_updater.archive_failed(args, user_dict, mongo_collection)
     except Exception as e:
-        msg = f"ERROR: from /retrieve_failed: {e}"
+        msg = f"ERROR: from /archive_failed: {e}"
         util.log_email(msg, error=True)
         return msg
 
@@ -124,6 +109,21 @@ def retrieve_success_url():
         value = status_updater.retrieve_success(args, user_dict, mongo_collection)
     except Exception as e:
         msg = f"ERROR: from /retrieve_success: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
+
+
+@app.route("/retrieve_failed", methods=['GET'])
+def retrieve_failed_url():
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        value = status_updater.retriev_failed(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /retrieve_failed: {e}"
         util.log_email(msg, error=True)
         return msg
 
