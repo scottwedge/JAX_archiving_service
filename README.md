@@ -428,6 +428,9 @@ This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
 - `job_id`
    - Value is a string representing the `job_id` of the failed job.
 
+---
+Example of [metadata][metadata_retrieve_processing] state after this endpoint updates the metadata.
+
 #### Example `GET` request in python
 ```
 import requests
@@ -460,6 +463,9 @@ This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
    - String corresponding to the object id in mongoDB for the metadata.
 - `job_id`
    - Value is a string representing the `job_id` of the failed job.
+
+---
+Example of [metadata][metadata_retrieve_success] state after this endpoint updates the metadata.
 
 #### Example `GET` request in python
 ```
@@ -494,6 +500,9 @@ This `GET` will include three args, `api_key`, `obj_id` and `job_id`.
    - String corresponding to the object id in mongoDB for the metadata.
 - `job_id`
    - Value is a string representing the `job_id` of the failed job.
+
+---
+Example of [metadata][metadata_retrieve_failed] state after this endpoint updates the metadata.
 
 #### Example `GET` request in python
 ```
@@ -548,5 +557,5 @@ print(response.json())
 [metadata_retrieve_ready]: metadata.md#metadata-retrieve-request-ready
 [metadata_retrieve_queued]: metadata.md#metadata-retrieve-queued
 [metadata_retrieve_processing]: metadata.md#metadata-retrieve-processing
-[metadata_retrieve_completed]: metadata.md#metadata-retrieve-completed
+[metadata_retrieve_success]: metadata.md#metadata-retrieve-success
 [metadata_retrieve_failed]: metadata.md#metadata-retrieve-failed
