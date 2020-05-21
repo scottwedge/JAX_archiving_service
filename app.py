@@ -46,6 +46,8 @@ def archive_processing_url():
     try:
         args = dict(flask.request.args)
         user_dict = util.get_api_user(args)
+        if not user_dict.get('admin'):
+            raise Exception("/archive_processing is only available to admins.")
         value = status_updater.archive_processing(args, user_dict, mongo_collection)
     except Exception as e:
         msg = f"ERROR: from /archive_processing: {e}"
@@ -61,6 +63,8 @@ def archive_success_url():
     try:
         args = dict(flask.request.args)
         user_dict = util.get_api_user(args)
+        if not user_dict.get('admin'):
+            raise Exception("/archive_success is only available to admins.")
         value = status_updater.archive_success(args, user_dict, mongo_collection)
     except Exception as e:
         msg = f"ERROR: from /archive_success: {e}"
@@ -76,6 +80,8 @@ def archive_failed_url():
     try:
         args = dict(flask.request.args)
         user_dict = util.get_api_user(args)
+        if not user_dict.get('admin'):
+            raise Exception("/archive_failed is only available to admins.")
         value = status_updater.archive_failed(args, user_dict, mongo_collection)
     except Exception as e:
         msg = f"ERROR: from /archive_failed: {e}"
@@ -91,6 +97,8 @@ def retrieve_processing_url():
     try:
         args = dict(flask.request.args)
         user_dict = util.get_api_user(args)
+        if not user_dict.get('admin'):
+            raise Exception("/retrieve_processing is only available to admins.")
         value = status_updater.retrieve_processing(args, user_dict, mongo_collection)
     except Exception as e:
         msg = f"ERROR: from /retrieve_processing: {e}"
@@ -106,6 +114,8 @@ def retrieve_success_url():
     try:
         args = dict(flask.request.args)
         user_dict = util.get_api_user(args)
+        if not user_dict.get('admin'):
+            raise Exception("/retrieve_success is only available to admins.")
         value = status_updater.retrieve_success(args, user_dict, mongo_collection)
     except Exception as e:
         msg = f"ERROR: from /retrieve_success: {e}"
@@ -121,6 +131,8 @@ def retrieve_failed_url():
     try:
         args = dict(flask.request.args)
         user_dict = util.get_api_user(args)
+        if not user_dict.get('admin'):
+            raise Exception("/retrieve_failed is only available to admins.")
         value = status_updater.retriev_failed(args, user_dict, mongo_collection)
     except Exception as e:
         msg = f"ERROR: from /retrieve_failed: {e}"

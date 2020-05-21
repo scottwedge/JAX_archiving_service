@@ -6,7 +6,6 @@ import inspect
 import smtplib
 import subprocess
 import urllib.parse
-from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
