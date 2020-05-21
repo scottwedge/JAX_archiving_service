@@ -97,7 +97,7 @@ def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
 
 def gen_msg(msg, error=True):
 
-    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     frame = inspect.currentframe()
     filename = inspect.getframeinfo(frame).filename.split('/')[-1]
     lineno = frame.f_back.f_lineno
