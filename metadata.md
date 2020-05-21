@@ -490,12 +490,6 @@ Back to [`/retrieve_success`][9]
 Example of metadata when retrieval fails
 ```
 {
-	"current_user": {
-		"fname": "Research",
-		"lname": "IT",
-		"username": "rit",
-		"email": "rit@jax.org"
-	},
     "managerUserId": "pi",
     "userId": "postdoc",
     "projectName": "Nobel Prize Project (NPP)",
