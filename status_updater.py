@@ -68,7 +68,7 @@ def archive_processing(args, user_dict, mongo_collection):
              'archival_status': 'processing'}
         })
     if not result.acknowledged:
-        raise Exception(util.gen_msg("MongoDB update not acknowledged."))
+        raise Exception(util.gen_msg(f"MongoDB update on _id '{id1}' not acknowledged."))
     
     return job_id
 
@@ -194,7 +194,7 @@ def archive_success_update_record(record, job_id, source_size, archived_size, mo
         })
 
     if not result.acknowledged:
-        raise Exception(util.gen_msg("MongoDB update not acknowledged."))
+        raise Exception(util.gen_msg("MongoDB update on _id '{id1}' not acknowledged."))
 
     return id1
 
@@ -253,22 +253,55 @@ def archive_success(args, user_dict, mongo_collection):
 ########################################################################################
 ## /archive_failed:
 
-## takes job_id; returns error msg from pbs;
-##   archival_status -> failed; 
-##   when_archival_failed -> e.g. ??????:
-
 def archive_failed(args, user_dict, mongo_collection):
     '''
+    Marks archive record as having failed. 
+      Takes job_id;
+      Returns ???'error msg from pbs'???
+    from:
+    "ready_for_pbs": false,
+    "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
+    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_started": "2019-12-31 22:44:08 EDT-0400",
+    "when_archival_completed": null,
+    "failed_multiple": null,
+    "archival_status": "processing",
+    "job_id": "8638.ctarchive.jax.org",
+
+    to:
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
     "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
     "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
-    "when_archival_failed": "2019-12-31 22:46:08 EDT-0400",
+    +"when_archival_failed": "2019-12-31 22:46:08 EDT-0400",
     "when_archival_completed": null,
     "failed_multiple": null,
-    "archival_status": "failed"
+    *"archival_status": "failed",
+    "job_id": "8638.ctarchive.jax.org",
     '''
-    return user_dict
+
+    job_id = args.get('job_id')
+    if not job_id:
+        raise Exception(util.gen_msg("No job_id passed."))
+
+    condition = {'job_id': job_id}
+    cursor = mongo_collection.find(condition, {'_id': 1})
+    count = cursor.count()
+    if count != 1:
+        raise Exception(util.gen_msg(f"{count} records match {condition}.\n"))
+
+    id1 = cursor[0]['_id']      ## '_id' field from 1st record (dict); type(id1): ObjectId
+    result = mongo_collection.update_one(
+        {'_id': id1},                                             ## match condition
+        {'$set': {
+             'when_archival_failed': util.get_timestamp(),
+             'archival_status': 'failed'}
+        })
+
+    if not result.acknowledged:
+        raise Exception(util.gen_msg("MongoDB update on _id '{id1}' not acknowledged."))
+
+    return job_id
 
 
 ########################################################################################
