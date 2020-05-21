@@ -253,7 +253,8 @@ Example of metadata state when `/archive_failed` updates metadata. Note that met
     "when_archival_completed": null,
     "failed_multiple": null,
     "archival_status": "failed",
-    "user_metadata": {}
+    "user_metadata": {},
+    "job_id": "8638.ctarchive.jax.org",
 }
 ```
 
