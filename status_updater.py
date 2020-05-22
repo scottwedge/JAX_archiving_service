@@ -19,15 +19,20 @@ Before archive_processing() is called, record looks like:
     "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
-    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_queued": null,
     "when_archival_started": null,
     "when_archival_completed": null,
     "failed_multiple": null,
-    "archival_status": "queued",
+    "archival_status": "ready_to_submit",
     "user_metadata": {},
-    "job_id": "8638.ctarchive.jax.org",
 }
 '''
+
+## global imports:
+
+import bson.objectid
+
+## local imports:
 
 import config
 import util
@@ -35,8 +40,59 @@ import util
 ########################################################################################
 ## /archive_queued:
 
+def archive_queued_proc_args(args):
+
+    obj_id = args.get('obj_id')
+    if not obj_id:
+        raise Exception(util.gen_msg("No obj_id passed."))
+
+    try:
+        id1 = bson.objectid.ObjectId(obj_id)
+    except Exception as e:
+        raise Exception(util.gen_msg("obj_id '{obj_id}' not valid: {e}"))
+
+    job_id = args.get('job_id')
+    if not job_id:
+        raise Exception(util.gen_msg("No job_id passed."))
+
+    return id1, job_id
+
+
 def archive_queued(args, user_dict, mongo_collection):
-    return user_dict
+    '''
+    Takes obj_id, job_id (str)
+      Returns job_id
+
+    "ready_for_pbs": false,
+    "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
+    "+when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_started": null,
+    "when_archival_completed": null,
+    "failed_multiple": null,
+    "*archival_status": "queued",
+    "+job_id": "8638.ctarchive.jax.org",
+    '''
+
+    obj_id, job_id = archive_queued_proc_args(args)
+
+    condition = {'_id': obj_id}
+    cursor = mongo_collection.find(condition, {'_id': 1})
+    count = cursor.count()
+    if count != 1:
+        raise Exception(util.gen_msg(f"{count} records match {condition}.\n"))
+
+    result = mongo_collection.update_one(
+        {'_id': obj_id},                                             ## match condition
+        {'$set': {
+             'when_archival_queued': util.get_timestamp(),
+             'archival_status': 'queued',
+             'job_id': job_id}
+        })
+
+    if not result.acknowledged:
+        raise Exception(util.gen_msg(f"MongoDB update on _id '{obj_id}' not acknowledged."))
+
+    return job_id
 
 
 ########################################################################################
@@ -68,6 +124,7 @@ def archive_processing(args, user_dict, mongo_collection):
         raise Exception(util.gen_msg(f"{count} records match {condition}.\n"))
 
     id1 = cursor[0]['_id']      ## '_id' field from 1st record (dict); type(id1): ObjectId
+
     result = mongo_collection.update_one(
         {'_id': id1},                                             ## match condition
         {'$set': {
