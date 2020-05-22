@@ -527,6 +527,8 @@ print(response.json())
 
 ## Archiving General Overall Diagram
 
+[back to top][endpoints]
+
 ![archiving diagram](https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/Archiving_Diagram_JAS.png "Archiving Diagram")
 
 
