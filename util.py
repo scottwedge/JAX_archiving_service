@@ -202,7 +202,7 @@ def mongo_ingest(metadata, collection):
         if not document:
             metadata.update(
                 {
-                    "ready_for_submit": True,
+                    "ready_for_pbs": True,
                     "when_ready_for_pbs": get_timestamp(),
                     "when_archival_queued": None,
                     "when_archival_started": None,
@@ -222,7 +222,7 @@ def mongo_ingest(metadata, collection):
             and document["failed_multiple"] != True
         ):
             mongo_update_by_key(
-                "archivedPath", metadata["archivedPath"], "ready_for_submit", True
+                "archivedPath", metadata["archivedPath"], "ready_for_pbs", True
             )
             mongo_update_by_key(
                 "archivedPath", metadata["archivedPath"], "failed_multiple", True
@@ -235,25 +235,20 @@ def mongo_ingest(metadata, collection):
             "dry_run" in document["archival_status"]
             and document["failed_multiple"] != True
         ):
-            # TODO: combine these two mongo updates into 1 action
             mongo_update_by_key(
-                "archivedPath",
-                metadata["archivedPath"],
-                "when_ready_for_submit",
-                get_timestamp(),
+                "archivedPath", metadata["archivedPath"], "ready_for_pbs", True
             )
-            mongo_update_by_key(
-                "archivedPath", metadata["archivedPath"], "ready_for_submit", True
-            )
+            # mongo_update_by_key(
+            #     "archivedPath",
+            #     metadata["archivedPath"],
+            #     "when_ready_for_pbs",
+            #     get_timestamp(),
+            # )
             return document
 
         else:
             mongo_update_by_key(
-                "archivedPath",
-                metadata["archivedPath"],
-                "ready_for_submit",
-                False,
-                gold=False,
+                "archivedPath", metadata["archivedPath"], "ready_for_pbs", False
             )
             log_email(
                 f"Metadata ingestion skipped because {metadata['archivedPath']} already in Mongo"
