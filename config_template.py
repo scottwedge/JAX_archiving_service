@@ -24,7 +24,15 @@ api_keys = {
         'firstname': 'mitch',
         'lastname': 'kostich',
         'email': 'mitch.kostich@jax.org',
-    }
+        'admin': False,
+    },
+    '123abc': {
+        'userid': 'kostim',
+        'firstname': 'mitch',
+        'lastname': 'kostich',
+        'email': 'mitch.kostich@jax.org',
+        'admin': True,
+    },
 }
 
 time = {

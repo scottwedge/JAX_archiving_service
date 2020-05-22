@@ -6,7 +6,6 @@ import inspect
 import smtplib
 import subprocess
 import urllib.parse
-from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -98,7 +97,7 @@ def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
 
 def gen_msg(msg, error=True):
 
-    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     frame = inspect.currentframe()
     filename = inspect.getframeinfo(frame).filename.split('/')[-1]
     lineno = frame.f_back.f_lineno
@@ -130,12 +129,12 @@ def get_api_user(args_dict):
         raise Exception(gen_msg("args_dict is not a dict."))
 
     if 'api_key' not in args_dict:
-        raise Exception(gen_msg("no api key present; unauthorized request."))
+        raise Exception(gen_msg("no api_key present; unauthorized request."))
     api_key = args_dict.get('api_key')
 
     user_info = config.api_keys.get(api_key)
     if not user_info:
-        raise Exception(gen_msg("invalid api key"))
+        raise Exception(gen_msg("invalid api_key"))
 
     try:
         groups_string = subprocess.getoutput(f"id -Gn {user_info['userid']}")
