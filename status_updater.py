@@ -38,9 +38,13 @@ import config
 import util
 
 ########################################################################################
-## /archive_queued:
+## argument handling:
 
-def archive_queued_proc_args(args):
+def get_args_objid_jobid(args):
+    '''
+    Takes args (dict) with str values for keys 'obj_id' and 'job_id';
+    Returns values for 'obj_id' (bson.objectid.ObjectId) and 'job_id' (str);
+    '''
 
     obj_id = args.get('obj_id')
     if not obj_id:
@@ -58,6 +62,9 @@ def archive_queued_proc_args(args):
     return id1, job_id
 
 
+########################################################################################
+## /archive_queued:
+
 def archive_queued(args, user_dict, mongo_collection):
     '''
     Takes obj_id, job_id (str)
@@ -73,7 +80,7 @@ def archive_queued(args, user_dict, mongo_collection):
     "+job_id": "8638.ctarchive.jax.org",
     '''
 
-    obj_id, job_id = archive_queued_proc_args(args)
+    obj_id, job_id = get_args_objid_jobid(args)
 
     condition = {'_id': obj_id}
     cursor = mongo_collection.find(condition, {'_id': 1})
@@ -370,8 +377,106 @@ def archive_failed(args, user_dict, mongo_collection):
 ########################################################################################
 ## /retrieve_queued:
 
+def get_retrievals_idx(job_id, status, mongo_record):
+    '''
+    Searches mongo_record.retrievals (list of dicts) for subrecord (dict) with 
+      matching job_id and retrieval_status; if no matching job_id, but finds
+      subrecord with same status and no job_id set, returns the index of the 
+      first such subrecord.
+    Takes: 
+      job_id for retrieval
+      status: expected retrieval_status for the matching retrieval
+      mongo_record: mongodb record (dict) to be searched.
+    Returns:
+      index (int >= 0) of best matching subrecord in mongo_record.retrievals list.
+    '''
+
+    if not isinstance(mongo_record, dict):
+        raise Exception(util.gen_msg(
+            f"expected mongo_record to be dict; got: '{type(mongo_record)}'; record: {mongo_record}"
+        ))
+
+    retrievals = mongo_record.get('retrievals')
+    if not retrievals:
+        raise Exception(util.gen_msg(
+            f"unexpectedly mongo_record does not have 'retrievals' key; record: {mongo_record}"
+        ))
+    if not isinstance(retrievals, list):
+        raise Exception(util.gen_msg(
+            f"expected 'retrievals' to be dict; got: '{type(retrievals)}'; record: {mongo_record}"
+        ))
+
+    best_idx = -1
+    for idx in range(len(retrievals)):
+        if not isinstance(retrievals[idx], dict):
+            continue
+        status_idx = retrievals[idx].get('retrieval_status')
+        if job_id == retrievals[idx].get('job_id'):
+            if status_idx != status:
+                raise Exception(util.gen_msg(
+                    f"Found job_id '{job_id}', but retrieval status '{status_idx}', expected '{status}'; record: {mongo_record}"
+                ))
+            return idx
+        elif status_idx == status and best_idx < 0:
+            best_idx = idx
+
+    if best_idx < 0:
+        raise Exception(util.gen_msg(f"Could not find retrieval job_id '{job_id}' in record: {mongo_record}")) 
+
+    return best_idx
+
+
 def retrieve_queued(args, user_dict, mongo_collection):
-    return user_dict
+    '''
+    Takes: 
+      args (dict) with obj_id (str), job_id (str);
+      user_dict (dict) not used;
+      mongo_collection: MongoDB database.collection
+    Returns:
+      job_id (str)
+
+    from:
+    "retrievals": [{
+      "retrieval_status": "ready_for_pbs",
+      "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+      "when_retrieval_queued": null,
+      "when_retrieval_started": null,
+      "when_retrieval_completed": null}]
+
+    to:
+    "retrievals": [{
+      +"job_id": "8649.ctarchive.jax.org",
+      *"retrieval_status": "queued",
+      "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+      *"when_retrieval_queued": "2020-01-02 07:34:39 EDT-0400",
+      "when_retrieval_started": null,
+      "when_retrieval_completed": null}]
+    '''
+
+    expected_status = 'ready_for_pbs'
+
+    obj_id, job_id = get_args_objid_jobid(args)
+
+    condition = {'_id': obj_id}
+    cursor = mongo_collection.find(condition)
+    if cursor.count() != 1:
+        raise Exception(util.gen_msg(f"{count} records match {condition}.\n"))
+
+    idx = get_retrievals_idx(job_id, expected_status, cursor[0])
+    prefix = 'retrievals.' + str(idx)
+
+    result = mongo_collection.update_one(
+        {'_id': obj_id},
+        {'$set': {
+            f'{prefix}.job_id': job_id,
+            f'{prefix}.retrieval_status': 'queued',
+            f'{prefix}.when_retrieval_queued': util.get_timestamp()}
+        })
+
+    if not result.acknowledged:
+        raise Exception(util.gen_msg(f"MongoDB update on _id '{obj_id}' not acknowledged."))
+
+    return job_id
 
 
 ########################################################################################
