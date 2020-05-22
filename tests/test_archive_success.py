@@ -14,21 +14,22 @@ database = config.mongo['db']                ## the database where we will write
 collection = config.mongo['collection']    
 
 api_key = '123abc'
-obj_id = '5ec7cac93c9619864cc73e4d'
 job_id = 'xy121yx'
+source_size = 1000000
+archived_size = 800000
 protocol = 'https'
 host = '127.0.0.1'
 port = '5000'
 
+def build_url(api_key=None, job_id=None, source_size=None, archived_size=None, protocol=protocol, port=port):
 
-def build_url(api_key=None, obj_id=None, job_id=None, protocol=protocol, port=port):
-
-    route = f'archive_queued'
+    route = f'archive_success'
 
     param_list = []
     if api_key: param_list.append(f"api_key={api_key}")
-    if obj_id: param_list.append(f"obj_id={obj_id}")
     if job_id: param_list.append(f"job_id={job_id}")
+    if source_size: param_list.append(f"sourceSize={source_size}")
+    if archived_size: param_list.append(f"archivedSize={archived_size}")
 
     if len(param_list) == 0: params = ''
     elif len(param_list) == 1: params = param_list[0]
@@ -57,7 +58,8 @@ def get_response_value(url):
 
 if __name__ == '__main__':
 
-    url = build_url(api_key=api_key, obj_id=obj_id, job_id=job_id, protocol=protocol, port=port)
+    url = build_url(api_key=api_key, job_id=job_id, source_size=source_size, 
+                    archived_size=archived_size, protocol=protocol, port=port)
 
     print(f"testing url '{url}'")
     value = get_response_value(url)

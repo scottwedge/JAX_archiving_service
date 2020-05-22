@@ -48,7 +48,7 @@ docs = [
         "when_archival_completed": None,
         "failed_multiple": None,
         "archival_status": "ready_to_submit",
-        "user_metadata": {},
+        "user_metadata": {"band": "megadeath", "genre": "smooth jaz"},
     },
     {
         "_id": bson.objectid.ObjectId("5ec7cac93c9619864cc73e4c"),
@@ -75,7 +75,7 @@ docs = [
         "when_archival_completed": None,
         "failed_multiple": None,
         "archival_status": "ready_to_submit",
-        "user_metadata": {},
+        "user_metadata": {"status": "on the lamb"},
     },
     {
         "_id": bson.objectid.ObjectId("5ec7cac93c9619864cc73e4d"),
