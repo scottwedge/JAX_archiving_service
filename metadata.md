@@ -5,9 +5,9 @@
 Example of metadata when initially inserted into mongoDB
 ```
 {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -20,14 +20,14 @@ Example of metadata when initially inserted into mongoDB
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": true,
     "when_ready_for_pbs": null,
     "when_archival_queued": null,
     "when_archival_started": null,
     "when_archival_completed": null,
     "failed_multiple": null,
-    "archival_status": "ready_for_mongo",
+    "archival_status": "processing_metadata",
     "user_metadata": {},
 }
 ```
@@ -39,9 +39,9 @@ Back to [archive][metadata_link]
 Example of metadata when initially inserted into mongoDB
 ```
 {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -54,7 +54,7 @@ Example of metadata when initially inserted into mongoDB
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
     "when_archival_queued": null,
@@ -73,9 +73,9 @@ Back to [archive][metadata_link]
 Example of metadata when initially inserted into mongoDB
 ```
 {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -88,7 +88,7 @@ Example of metadata when initially inserted into mongoDB
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
     "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
@@ -108,9 +108,9 @@ Back to [`/archive_queued`][14]
 Example of metadata state when `/archive_processing` updates metadata
 ```
 {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -123,7 +123,7 @@ Example of metadata state when `/archive_processing` updates metadata
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
     "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
@@ -143,9 +143,9 @@ Back to [`/archive_processing`][5]
 Example of metadata state when `/archive_success` updates metadata
 ```
 {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -158,7 +158,7 @@ Example of metadata state when `/archive_success` updates metadata
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
     "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
@@ -186,9 +186,9 @@ Back to [`/archive_success`][6]
 Example of metadata when archiving is completed
 ```
 {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -201,7 +201,7 @@ Example of metadata when archiving is completed
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "archival_status": "completed",
     "archivedSize": {
         "$numberInt": "396700549"
@@ -229,9 +229,9 @@ Back to [`/archive_success`][6]
 Example of metadata state when `/archive_failed` updates metadata. Note that metadata state can look different from example below depending on what stage of archiving process the failure happens.
 ```
 {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -244,7 +244,7 @@ Example of metadata state when `/archive_failed` updates metadata. Note that met
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
     "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
@@ -272,9 +272,9 @@ Example of metadata when request ready for submission to pbs
 		"username": "rit",
 		"email": "rit@jax.org"
 	},
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -287,7 +287,7 @@ Example of metadata when request ready for submission to pbs
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "archival_status": "completed",
     "submit_progress": [],
     "archivedSize": {
@@ -329,9 +329,9 @@ Example of metadata after request successfully queued
 		"username": "rit",
 		"email": "rit@jax.org"
 	},
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -344,7 +344,7 @@ Example of metadata after request successfully queued
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "archival_status": "completed",
     "submit_progress": [],
     "archivedSize": {
@@ -387,9 +387,9 @@ Example of metadata after job begins processing
 		"username": "rit",
 		"email": "rit@jax.org"
 	},
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -402,7 +402,7 @@ Example of metadata after job begins processing
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "archival_status": "completed",
     "submit_progress": [],
     "archivedSize": {
@@ -439,9 +439,9 @@ Back to [`/retrieve_processing`][8]
 Example of metadata after retrieve job completes
 ```
 {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -454,7 +454,7 @@ Example of metadata after retrieve job completes
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "archival_status": "completed",
     "submit_progress": [],
     "archivedSize": {
@@ -491,9 +491,9 @@ Back to [`/retrieve_success`][9]
 Example of metadata when retrieval fails
 ```
 {
-    "managerUserId": "pi",
-    "userId": "postdoc",
-    "projectName": "Nobel Prize Project (NPP)",
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
     "classification": "topSecret",
     "grant_id": "NA",
     "notes": "Who needs notes?",
@@ -506,7 +506,7 @@ Example of metadata when retrieval fails
         "email": "post.doc@jax.org"
     },
     "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
-    "sourceFolderPath": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "archival_status": "completed",
     "submit_progress": [],
     "archivedSize": {

@@ -14,9 +14,9 @@ import config
 from logger import LOGGER
 
 ## imports conditional on config:
-if config.testing['mongo_on']: 
+if config.testing["mongo_on"]:
     import pymongo
-else: 
+else:
     import mocks.pymongo_mock
 
 
@@ -37,20 +37,31 @@ def get_timestamp(format=config.time['format_sec'], zone=config.time['zone']):
 def get_mongo_client():
 
     try:
-        user = urllib.parse.quote_plus(config.mongo.get('user'))       ## percent-escape string
-        passwd = urllib.parse.quote_plus(config.mongo.get('passwd'))   ## percent-escape string
-        host = config.mongo.get('host')
-        port = config.mongo.get('port')
+        user = urllib.parse.quote_plus(
+            config.mongo.get("user")
+        )  ## percent-escape string
+        passwd = urllib.parse.quote_plus(
+            config.mongo.get("passwd")
+        )  ## percent-escape string
+        host = config.mongo.get("host")
+        port = config.mongo.get("port")
         uri = f"mongodb://{user}:{passwd}@{host}:{port}"
-        client_obj = pymongo.MongoClient(uri, authSource=config.mongo.get('authdb'))
-        client_obj.admin.command('ismaster')      ## tests for client != None and good connection
+        client_obj = pymongo.MongoClient(uri, authSource=config.mongo.get("authdb"))
+        client_obj.admin.command(
+            "ismaster"
+        )  ## tests for client != None and good connection
     except Exception as e:
         log_email(f"ERROR: could not connect to '{host}:{port}': {e}")
         return None
 
     return client_obj
 
-def get_mongo_collection(client_obj=None, database_name=config.mongo.get('db'), collection_name=config.mongo.get('collection')):
+
+def get_mongo_collection(
+    client_obj=None,
+    database_name=config.mongo.get("db"),
+    collection_name=config.mongo.get("collection"),
+):
 
     if not isinstance(client_obj, pymongo.mongo_client.MongoClient):
         client_obj = get_mongo_client()
@@ -58,15 +69,17 @@ def get_mongo_collection(client_obj=None, database_name=config.mongo.get('db'), 
             log_email(f"ERROR: get_mongo_client() failed.")
             return None
 
-    try: 
+    try:
         db_obj = client_obj[database_name]
         collection_obj = db_obj[collection_name]
     except Exception as e:
-        log_email(f"ERROR: could not connect to collection '{database_name}.{collection_name}': {e}")
+        log_email(
+            f"ERROR: could not connect to collection '{database_name}.{collection_name}': {e}"
+        )
         return None
 
     return collection_obj
-  
+
 
 def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
     msg = MIMEMultipart()
@@ -99,7 +112,7 @@ def gen_msg(msg, error=True):
 
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     frame = inspect.currentframe()
-    filename = inspect.getframeinfo(frame).filename.split('/')[-1]
+    filename = inspect.getframeinfo(frame).filename.split("/")[-1]
     lineno = frame.f_back.f_lineno
     prefix = f"[{ts}, {filename}:{lineno}, "
     prefix += "ERROR]" if error else "INFO]"
@@ -128,9 +141,9 @@ def get_api_user(args_dict):
     if not isinstance(args_dict, dict):
         raise Exception(gen_msg("args_dict is not a dict."))
 
-    if 'api_key' not in args_dict:
-        raise Exception(gen_msg("no api_key present; unauthorized request."))
-    api_key = args_dict.get('api_key')
+    if "api_key" not in args_dict:
+        raise Exception(gen_msg("no api key present; unauthorized request."))
+    api_key = args_dict.get("api_key")
 
     user_info = config.api_keys.get(api_key)
     if not user_info:
@@ -142,6 +155,121 @@ def get_api_user(args_dict):
     except Exception as e:
         raise Exception(gen_msg(f"could not get groups: {e}"))
 
-    user_info['groups_list'] = groups_list
+    user_info["groups_list"] = groups_list
     return user_info
 
+
+def process_key(key, mydict):
+    symbols = ["$", "."]
+    replaced = False
+    for symbol in symbols:
+        if symbol in key:
+            log_email(f"Found illegal character. Will remove {symbol} from {key}")
+            new_key = key.replace(symbol, "")
+            replaced = True
+    if replaced:
+        mydict[new_key] = mydict[key]
+        del mydict[key]
+    return mydict
+
+
+def scrub_dict_keys(dictionary):
+    for k, v in dictionary.items():
+        process_key(k, dictionary)
+        if isinstance(v, dict):
+            scrub_dict_keys(v)
+    return dictionary
+
+
+def mongo_delete_doc(key, val, collection):
+    query = {"_id": ObjectId(val)} if "_id" == key else {key: val}
+    # if "_id" == key:
+    #     query = {"_id": ObjectId(val)}
+    # else:
+    #     query = {key: val}
+    collection.delete_one(query)
+    return
+
+
+def mongo_update_by_key(key, val, modify_key, modify_val, collection):
+    query = {"_id": ObjectId(val)} if "_id" == key else {key: val}
+    new_val = {"$set": {modify_key: modify_val}}
+    result = collection.update_one(query, new_val)
+    assert result.acknowledged
+    return result.modified_count
+
+
+def add_current_user(user: dict, obj_id: str, collection):
+    query = {"_id": ObjectId(object_id)}
+    new_val = {"$set": {"current_user": user}}
+    result = collection.update_one(query, new_val)
+    assert result.acknowledged
+    return result.modified_count
+
+
+def mongo_ingest(metadata, collection):
+    """
+    dict must be entire body of post request where one of the top-level keys
+    is "metadata" which has for its value a dict containing the metadata to ingest
+    """
+    document = collection.find_one({"archivedPath": metadata["archivedPath"]})
+    try:
+        if not document:
+            metadata.update(
+                {
+                    "ready_for_pbs": True,
+                    "when_ready_for_pbs": get_timestamp(),
+                    "when_archival_queued": None,
+                    "when_archival_started": None,
+                    "when_archival_completed": None,
+                    "failed_multiple": False,
+                    "archival_status": "ready_to_submit",
+                }
+            )
+            metadata = scrub_dict_keys(metadata)
+            inserted_id = op_collection.insert_one(metadata).inserted_id
+            log_email(f"Metadata inserted with id: {inserted_id}")
+            metadata["_id"] = str(inserted_id)
+            return metadata
+
+        elif (
+            "failed" in document["archival_status"]
+            and document["failed_multiple"] != True
+        ):
+            mongo_update_by_key(
+                "archivedPath", metadata["archivedPath"], "ready_for_pbs", True
+            )
+            mongo_update_by_key(
+                "archivedPath", metadata["archivedPath"], "failed_multiple", True
+            )
+
+            document = collection.find_one({"archivedPath": metadata["archivedPath"]})
+            return document
+
+        elif (
+            "dry_run" in document["archival_status"]
+            and document["failed_multiple"] != True
+        ):
+            mongo_update_by_key(
+                "archivedPath", metadata["archivedPath"], "ready_for_pbs", True
+            )
+            # mongo_update_by_key(
+            #     "archivedPath",
+            #     metadata["archivedPath"],
+            #     "when_ready_for_pbs",
+            #     get_timestamp(),
+            # )
+            return document
+
+        else:
+            mongo_update_by_key(
+                "archivedPath", metadata["archivedPath"], "ready_for_pbs", False
+            )
+            log_email(
+                f"Metadata ingestion skipped because {metadata['archivedPath']} already in Mongo"
+            )
+            return document
+
+    except Exception as e:
+        log_email(f"Metadata insertion failed with error: {e}")
+        return metadata
