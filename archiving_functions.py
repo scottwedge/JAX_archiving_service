@@ -62,6 +62,26 @@ def build_archived_path_services(service_name: str, service_path: str):
     return archived_path
 
 
+def insert_archived_path(metadata, service_path):
+    if metadata["request_type"] == "faculty":
+        pi = metadata["manager_user_id"]
+        submitter = metadata["user_id"]
+        source_path = metadata["source_folder"]
+        project = source_path.split("/")[-1]
+        metadata["archivedPath"] = build_archived_path_faculty(pi, submitter, project)
+    else:
+        service_name = metadata["request_type"]
+        service_path = (
+            metadata["source_folder"]
+            if metadata["request_type"] == "gt"
+            else service_path
+        )
+        metadata["archivedPath"] = build_archived_path_services(
+            service_name, service_path
+        )
+    return metadata
+
+
 def completion_notification_body(
     action, source_path, destination_path, user, status=True
 ):
@@ -153,7 +173,7 @@ def metadata_keys_invalid(metadata: dict):
     return False
 
 
-def request_keys_invalid(request):
+def request_invalid(request):
     required_keys = {
         "metadata": {"type": dict, "error_msg": "metadata must be a dict,"},
         "source_folder": {"type": str, "error_msg": "source_folder must be a string"},
@@ -165,6 +185,14 @@ def request_keys_invalid(request):
         if not isinstance(request[key], required_keys[key]["type"]):
             return required_keys[key]["error_msg"]
     return False
+
+
+def process_metadata(json_arg, metadata, api_user):
+    metadata["request_type"] = metadata["request_type"].lower()
+    metadata["user_id"] = json_arg["metadata"]["user_id"]
+    metadata["submitter"] = api_user
+    metadata["source_folder"] = json_arg["source_folder"]
+    return metadata
 
 
 # def submit_to_pbs(
@@ -195,11 +223,11 @@ def request_keys_invalid(request):
 #     return job_id
 
 
-def archive_directory(request, debug: bool = False) -> None:
+def archive_directory(request, api_user, debug: bool = False) -> None:
     """
     :param json_arg: A decoded JSON string which it at its top level a
     dictionary.  Must have the following keys: requested_dest_dir,
-    sourceFolderPath, and metadata.  Additional keys are ignored.
+    source_folder, and metadata.  Additional keys are ignored.
 
     :param debug: Cause a dry-run of submitting to PBS; the request will be
     ignored.
@@ -208,8 +236,8 @@ def archive_directory(request, debug: bool = False) -> None:
     json_arg = request
 
     try:
-        if request_keys_invalid(request):
-            raise ValueError(request_keys_invalid(request))
+        if request_invalid(request):
+            raise ValueError(request_invalid(request))
     except Exception as e:
         log_email(f"Error processing request: {e}")
         return {"message": f"Error processing request: {e}"}, 400
@@ -220,63 +248,38 @@ def archive_directory(request, debug: bool = False) -> None:
         )
         if not metadata_keys_invalid(json_arg["metadata"]):
             metadata = json_arg["metadata"]
+        else:
+            raise ValueError(metadata_keys_invalid(json_arg["metadata"]))
+
+        request_types = ["faculty", "gt", "singlecell", "microscopy"]
         assert (
-            metadata["request_type"].lower() == "faculty"
-            or metadata["request_type"].lower() == "gt"
-            or metadata["request_type"].lower() == "singlecell"
-            or metadata["request_type"].lower() == "microscopy"
+            metadata["request_type"].lower() in request_types
         ), f'"request_type" not properly set. See {metadata_link} for guidance'
-        metadata["request_type"] = metadata["request_type"].lower()
-        metadata["userId"] = json_arg["metadata"]["userId"]
-        metadata["submitter"] = user
-        # del metadata["submitter"]["exists"]
+        metadata = process_metadata(json_arg, metadata, api_user)
     except Exception as e:
         return {"message": f"Error processing metadata: {e}"}, 400
 
-    # moved this logging line after metadata validation
-    app.logger.info(
-        f"{user['fname']} {user['lname']} ({user['username']}) requesting to archive {json_arg['sourceFolderPath']}"
+    log_email(
+        f"{api_user['fname']} {api_user['lname']} ({user['username']}) requesting"
+        + f" to archive {json_arg['source_folder']}"
     )
 
     try:
-        if metadata["request_type"] == "faculty":
-            pi = metadata["managerUserId"]
-            submitter = metadata["userId"]
-            source_path = json_arg["sourceFolderPath"]
-            project = source_path.split("/")[-1]
-            metadata["archivedPath"] = build_archived_path_faculty(
-                pi, submitter, project
-            )
-        elif metadata["request_type"] == "gt":
-            service_name = metadata["request_type"]
-            service_path = json_arg["sourceFolderPath"]
-            metadata["archivedPath"] = build_archived_path_services(
-                service_name, service_path
-            )
-        else:
-            assert (
-                len(json_arg["service_path"]) > 0
-            ), "'service_path' either missing or unset"
-            service_name = metadata["request_type"]
-            service_path = json_arg["service_path"]
-            metadata["archivedPath"] = build_archived_path_services(
-                service_name, service_path
-            )
+        metadata = insert_archived_path(metadata, json_arg["service_path"])
     except Exception as e:
         return (
-            {"message": f"Error processing archivedPath from sourceFolderPath: {e}"},
+            {"message": f"Error processing archivedPath from source_folder: {e}"},
             400,
         )
 
     try:
-        metadata["sourceFolderPath"] = json_arg["sourceFolderPath"]
         metadata = mongo_ingest(metadata)
     except Exception as e:
         return {"message": f"Error ingesting metadata: {e}"}, 400
 
     try:
         input = {
-            "source_dir": json_arg["sourceFolderPath"],
+            "source_dir": json_arg["source_folder"],
             "archive_dest_dir": metadata["archivedPath"],
         }
 
