@@ -375,7 +375,54 @@ def archive_failed(args, user_dict, mongo_collection):
     return job_id
 
 ########################################################################################
-## /retrieve_queued:
+## find matching retrievals records:
+
+def get_retrievals_list(mongo_record):
+
+    if not isinstance(mongo_record, dict):
+        raise Exception(util.gen_msg(
+            f"expected mongo_record to be dict; got: '{type(mongo_record)}'; record: {mongo_record}"
+        ))
+
+    retrievals = mongo_record.get('retrievals')
+    if not retrievals:
+        raise Exception(util.gen_msg(
+            f"unexpectedly mongo_record does not have 'retrievals' key; record: {mongo_record}"
+        ))
+    if not isinstance(retrievals, list):
+        raise Exception(util.gen_msg(
+            f"expected 'retrievals' to be list; got: '{type(retrievals)}'; record: {mongo_record}"
+        ))
+
+    return retrievals
+
+
+def get_retrievals_indices(job_id, status, mongo_record):
+
+    only_one_allowed = ['ready_for_pbs', 'queued']
+    pre_jobid_status = 'ready_for_pbs'
+
+    retrievals = get_retrievals_list(mongo_record)
+
+    idx_list = []
+    for idx in range(len(retrievals)):
+        if not isinstance(retrievals[idx], dict):
+            continue
+        status_idx = retrievals[idx].get('retrieval_status')
+
+        if status == pre_jobid_status:
+            if status_idx == status:
+                idx_list.append(idx)
+        elif job_id == retrievals[idx].get('job_id'):
+            if status_idx != status:
+                raise Exception(util.gen_msg(
+                    f"Found job_id '{job_id}', but retrieval status '{status_idx}', "
+                    + f"expected '{status}'; record: {mongo_record}"
+                ))
+            idx_list.append(idx)
+
+    return idx_list
+
 
 def get_retrievals_idx(job_id, status, mongo_record):
     '''
@@ -391,40 +438,37 @@ def get_retrievals_idx(job_id, status, mongo_record):
       index (int >= 0) of best matching subrecord in mongo_record.retrievals list.
     '''
 
-    if not isinstance(mongo_record, dict):
+    only_one_allowed = ['ready_for_pbs', 'queued']
+    pre_jobid_status = 'ready_for_pbs'
+
+    idx_list = get_retrievals_indices(job_id, status, mongo_record)
+
+    if len(idx_list) == 1:
+        return idx_list[0]
+    elif len(idx_list) == 0:
+        if status == pre_jobid_status:
+            raise Exception(util.gen_msg(
+                f"Could not find status '{status}' in record: {mongo_record}"
+            ))
+        else: 
+            raise Exception(util.gen_msg(
+                f"Could not find retrieval job_id '{job_id}' w/ status '{status}' "
+                + f"in record: {mongo_record}"
+            ))
+    elif status == pre_job_id_status:
         raise Exception(util.gen_msg(
-            f"expected mongo_record to be dict; got: '{type(mongo_record)}'; record: {mongo_record}"
+            f"{len(idx_list)} matches {idx_list} found w/ status '{status}' "
+            + f"in record: {mongo_record}"
+        )) 
+    else:
+        raise Exception(util.gen_msg(
+            f"{len(idx_list)} matches {idx_list} found w/ status '{status}' "
+            + f"in record: {mongo_record}"
         ))
 
-    retrievals = mongo_record.get('retrievals')
-    if not retrievals:
-        raise Exception(util.gen_msg(
-            f"unexpectedly mongo_record does not have 'retrievals' key; record: {mongo_record}"
-        ))
-    if not isinstance(retrievals, list):
-        raise Exception(util.gen_msg(
-            f"expected 'retrievals' to be dict; got: '{type(retrievals)}'; record: {mongo_record}"
-        ))
 
-    best_idx = -1
-    for idx in range(len(retrievals)):
-        if not isinstance(retrievals[idx], dict):
-            continue
-        status_idx = retrievals[idx].get('retrieval_status')
-        if job_id == retrievals[idx].get('job_id'):
-            if status_idx != status:
-                raise Exception(util.gen_msg(
-                    f"Found job_id '{job_id}', but retrieval status '{status_idx}', expected '{status}'; record: {mongo_record}"
-                ))
-            return idx
-        elif status_idx == status and best_idx < 0:
-            best_idx = idx
-
-    if best_idx < 0:
-        raise Exception(util.gen_msg(f"Could not find retrieval job_id '{job_id}' in record: {mongo_record}")) 
-
-    return best_idx
-
+########################################################################################
+## /retrieve_queued:
 
 def retrieve_queued(args, user_dict, mongo_collection):
     '''
@@ -482,23 +526,167 @@ def retrieve_queued(args, user_dict, mongo_collection):
 ########################################################################################
 ## /retrieve_processing:
 
-## takes obj_id, job_id; returns job_id;
-##   retrieval_status -> processing; 
-##   when_retrieval_started -> e.g. ??????:
-
 def retrieve_processing(args, user_dict, mongo_collection):
-    return user_dict
+    '''
+    Changes status of retrieval job matching args['obj_id'] and args['job_id'] 
+      from 'queued' to 'processing'.
+    Takes:
+      args (dict) with obj_id (str), job_id (str);
+      user_dict (dict) not used;
+      mongo_collection: MongoDB database.collection
+    Returns:
+      job_id (str)
+ 
+    MongoDB record changed from:
+    "retrievals": [{
+      "job_id": "8649.ctarchive.jax.org",
+      "retrieval_status": "queued",
+      "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+      "when_retrieval_queued": "2020-01-02 07:34:39 EDT-0400",
+      "when_retrieval_started": null,
+      "when_retrieval_completed": null
+    }]
+
+    to:
+    "retrievals": [{
+      "job_id": "8649.ctarchive.jax.org",
+      *"retrieval_status": "processing",
+      "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+      "when_retrieval_queued": "2020-01-02 07:34:39 EDT-0400",
+      *"when_retrieval_started": "2020-01-02 07:36:25 EDT-0400",
+      "when_retrieval_completed": null
+    }]
+    '''
+
+    expected_status = 'queued'
+
+    obj_id, job_id = get_args_objid_jobid(args)
+
+    condition = {'_id': obj_id}
+    cursor = mongo_collection.find(condition)
+    if cursor.count() != 1:
+        raise Exception(util.gen_msg(f"{count} records match {condition}.\n"))
+
+    idx = get_retrievals_idx(job_id, expected_status, cursor[0])
+    prefix = 'retrievals.' + str(idx)
+
+    result = mongo_collection.update_one(
+        {'_id': obj_id},
+        {'$set': {
+            f'{prefix}.retrieval_status': 'processing',
+            f'{prefix}.when_retrieval_started': util.get_timestamp()}
+        })
+
+    if not result.acknowledged:
+        raise Exception(util.gen_msg(f"MongoDB update on _id '{obj_id}' not acknowledged."))
+
+    return job_id
 
 
 ########################################################################################
 ## /retrieve_success:
 
+def get_current_username(mongo_record):
+
+    if not isinstance(mongo_record, dict):
+        raise Exception(util.gen_msg(
+            f"expected mongo_record to be dict; got: '{type(mongo_record)}'; record: {mongo_record}"
+        ))
+
+    if 'current_user' not in mongo_record:
+        raise Exception(util.gen_msg(
+            f"key 'current_user' not found in record: {mongo_record}"
+        ))
+
+    user_obj = mongo_record.get('current_user')
+
+    if not isinstance(user_obj, dict):
+        raise Exception(util.gen_msg(
+            f"current_user expected to be dict, got '{type(user_obj)}'."
+        ))
+
+    if 'username' not in user_obj:
+        raise Exception(util.gen_msg(
+            f"key 'username' not found in current_user in record: {mongo_record}"
+        ))
+
+    username = user_obj.get('username')
+    if not (username and isinstance(username, str)):
+        raise Exception(util.gen_msg(
+            f"username not specified or not str in current_user in record: {mongo_record}"
+        ))
+
+    return username
+ 
+
 ## takes obj_id, job_id; returns job_id;
-##   retrieval_status -> completed; 
-##   when_retrieval_completed -> e.g. ??????;
 
 def retrieve_success(args, user_dict, mongo_collection):
-    return user_dict
+    '''
+    Changes status of retrieval job matching args['obj_id'] and args['job_id']
+      from 'processing' to 'completed'.
+    Takes:
+      args (dict) with obj_id (str), job_id (str);
+      user_dict (dict) not used;
+      mongo_collection: MongoDB database.collection
+    Returns:
+      job_id (str)
+
+    Meta-data updated from:
+    "current_user": {
+      "fname": "Research",
+      "lname": "IT",
+      "username": "rit",
+      "email": "rit@jax.org"
+    },
+    "retrievals": [{
+      "job_id": "8649.ctarchive.jax.org",
+      "retrieval_status": "processing",
+      "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+      "when_retrieval_queued": "2020-01-02 07:34:39 EDT-0400",
+      "when_retrieval_started": "2020-01-02 07:36:25 EDT-0400",
+      "when_retrieval_completed": null
+    }]
+
+    to:
+    -"current_user": ...,
+    "retrievals": [{
+      +"username": "rit",
+      "job_id": "8649.ctarchive.jax.org",
+      *"retrieval_status": "completed",
+      "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+      "when_retrieval_queued": "2020-01-02 07:34:39 EDT-0400",
+      "when_retrieval_started": "2020-01-02 07:36:25 EDT-0400",
+      *"when_retrieval_completed": "2020-01-02 13:42:53 EDT-0400",
+    }]
+    '''
+
+    expected_status = 'processing'
+
+    obj_id, job_id = get_args_objid_jobid(args)
+
+    condition = {'_id': obj_id}
+    cursor = mongo_collection.find(condition)
+    if cursor.count() != 1:
+        raise Exception(util.gen_msg(f"{count} records match {condition}.\n"))
+
+    idx = get_retrievals_idx(job_id, expected_status, cursor[0])
+    prefix = 'retrievals.' + str(idx)
+
+    username = get_current_username(cursor[0])
+
+    result = mongo_collection.update_one(
+        {'_id': obj_id},
+        {'$set': {
+            f'{prefix}.username': username,
+            f'{prefix}.retrieval_status': 'completed',
+            f'{prefix}.when_retrieval_completed': util.get_timestamp()},
+         '$unset': { 'current_user': '' }})
+
+    if not result.acknowledged:
+        raise Exception(util.gen_msg(f"MongoDB update on _id '{obj_id}' not acknowledged."))
+
+    return job_id
 
 
 ########################################################################################
