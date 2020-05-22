@@ -27,7 +27,7 @@ Example of metadata when initially inserted into mongoDB
     "when_archival_started": null,
     "when_archival_completed": null,
     "failed_multiple": null,
-    "archival_status": "ready_for_mongo",
+    "archival_status": "processing_metadata",
     "user_metadata": {},
 }
 ```

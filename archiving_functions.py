@@ -44,7 +44,7 @@ def build_archived_path_services(service_name: str, service_path: str):
         try:
             service_path = validate_service_path(service_path)
         except:
-            return f"The following error occured when validating service_path: {e}"
+            return f"Error occured when validating service_path: {e}"
         service_path = Path(service_path)
         for parent in service_path.parents:
             # test if 'service' will match as a substring
@@ -128,30 +128,27 @@ def processing_notification_body(action, source_path, user):
     return email_content
 
 
-def metadata_keys_invalid(metadata: dict):
+def metadata_invalid(metadata: dict):
     """
-    :description: Given in input metadata about archived experimental files,
-    give a reason they might be incorrect.  Else, return nothing.
-
-    :param metadata: TODO
+    :description: Given in input metadata, give a reason metadata might be invalid.
+    Else, return nothing.
 
     :returns: A string with an explanation of a problem with the input metadata.
-    If there are no problems, then the return value is falsy.
-
-    :status: Incomplete
+    If there are no problems, then the return value is False stating metadata
+    is not invalid.
     """
     if type(metadata) != dict:
         return "metadata is not a dict, it is a " + str(type(metadata))
     if not metadata:
-        return "metadata is falsy"
+        return "metadata is missing"
 
     required_keys = {
-        "managerUserId": {
+        "manager_user_id": {
             "type": str,
             "error_msg": "managerUserId should be a string.",
         },
-        "userId": {"type": str, "error_msg": "userId should be a string."},
-        "projectName": {"type": str, "error_msg": "projectName should be a string."},
+        "user_id": {"type": str, "error_msg": "user_id should be a string."},
+        "project_name": {"type": str, "error_msg": "projectName should be a string."},
         "grant_id": {"type": str, "error_msg": "grant_id should be a string."},
         "notes": {"type": str, "error_msg": "notes should be a string."},
         "system_groups": {
@@ -170,6 +167,13 @@ def metadata_keys_invalid(metadata: dict):
                 return f"({key}) should not be the empty string"
         if "grant_id" in key and len(metadata[key]) == 0:
             metadata["grant_id"] = "None_entered_by_user"
+
+    metadata_link = (
+        "https://github.com/TheJacksonLaboratory/JAX_archiving_service#metadata"
+    )
+    request_types = ["faculty", "gt", "singlecell", "microscopy"]
+    if not metadata["request_type"].lower() in request_types:
+        return f'"request_type" not properly set. See {metadata_link} for guidance'
     return False
 
 
@@ -187,11 +191,14 @@ def request_invalid(request):
     return False
 
 
-def process_metadata(json_arg, metadata, api_user):
+def process_metadata(json_arg, api_user):
+    metadata = json_arg["metadata"]
     metadata["request_type"] = metadata["request_type"].lower()
-    metadata["user_id"] = json_arg["metadata"]["user_id"]
+    metadata["user_id"] = json_arg["metadata"]["user_id"].lower()
+    metadata["manager_user_id"] = metadata["manager_user_id"].lower()
     metadata["submitter"] = api_user
     metadata["source_folder"] = json_arg["source_folder"]
+    metadata["archival_status"] = "processing_metadata"
     return metadata
 
 
@@ -235,27 +242,19 @@ def archive_directory(request, api_user, debug: bool = False) -> None:
     # json_arg = request.get_json()
     json_arg = request
 
-    try:
+    try:  # validate request
         if request_invalid(request):
             raise ValueError(request_invalid(request))
     except Exception as e:
         log_email(f"Error processing request: {e}")
         return {"message": f"Error processing request: {e}"}, 400
 
-    try:
-        metadata_link = (
-            "https://github.com/TheJacksonLaboratory/JAX_archiving_service#metadata"
-        )
-        if not metadata_keys_invalid(json_arg["metadata"]):
-            metadata = json_arg["metadata"]
-        else:
-            raise ValueError(metadata_keys_invalid(json_arg["metadata"]))
+    try:  # validate and preprocess metadata
+        metadata = process_metadata(json_arg, api_user)
 
-        request_types = ["faculty", "gt", "singlecell", "microscopy"]
-        assert (
-            metadata["request_type"].lower() in request_types
-        ), f'"request_type" not properly set. See {metadata_link} for guidance'
-        metadata = process_metadata(json_arg, metadata, api_user)
+        if metadata_invalid(metadata):
+            raise ValueError(metadata_invalid(metadata))
+
     except Exception as e:
         return {"message": f"Error processing metadata: {e}"}, 400
 
@@ -264,15 +263,15 @@ def archive_directory(request, api_user, debug: bool = False) -> None:
         + f" to archive {json_arg['source_folder']}"
     )
 
-    try:
+    try:  # create and insert archivedPath
         metadata = insert_archived_path(metadata, json_arg["service_path"])
     except Exception as e:
         return (
-            {"message": f"Error processing archivedPath from source_folder: {e}"},
+            {"message": f"Error processing and/or inserting archivedPath: {e}"},
             400,
         )
 
-    try:
+    try:  # insert metadata into mongoDB
         metadata = mongo_ingest(metadata)
     except Exception as e:
         return {"message": f"Error ingesting metadata: {e}"}, 400
