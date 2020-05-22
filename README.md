@@ -5,6 +5,8 @@
 
 # API Documentation
 
+#### [Archiving Overview Diagram][archiving_diagram]
+
 ## Endpoints
 
 - [`/archive`][archive]
@@ -559,3 +561,4 @@ print(response.json())
 [metadata_retrieve_processing]: metadata.md#metadata-retrieve-processing
 [metadata_retrieve_success]: metadata.md#metadata-retrieve-success
 [metadata_retrieve_failed]: metadata.md#metadata-retrieve-failed
+[archiving_diagram]: #archiving-general-overall-diagram
