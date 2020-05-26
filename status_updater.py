@@ -697,6 +697,68 @@ def retrieve_success(args, user_dict, mongo_collection):
 ##   when_retrieval_completed -> None 
 
 def retrieve_failed(args, user_dict, mongo_collection):
-    return user_dict
+    '''
+    Takes:
+      obj_id:
+      job_id:
+    Returns: 
+      error_msg from pbs
+      job_id
 
+    Meta-data changed from:
+    -"current_user": {
+        "fname": "Research",
+        "lname": "IT",
+        "username": "rit",
+        "email": "rit@jax.org",
+    },
+    ...
+    "retrievals": [{
+        "job_id": "8649.ctarchive.jax.org",
+        *"retrieval_status": "processing",
+        "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+        "when_retrieval_queued": "2020-01-02 07:34:39 EDT-0400",
+        "when_retrieval_started": "2020-01-02 07:36:25 EDT-0400",
+        "when_retrieval_completed": null,
+    }]
+
+    to:
+    "retrievals": [{
+        "job_id": "8649.ctarchive.jax.org",
+        *"retrieval_status": "failed",
+        "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+        "when_retrieval_queued": "2020-03-30 12:32:14 EDT-0400",
+        "when_retrieval_started": "2020-03-30 12:32:15 EDT-0400",
+        "when_retrieval_completed": null,
+        +"when_retrieveal_failed": "2020-03-30 14:46:58 EDT-0400",
+        +"username": "rit",
+    }]
+    '''
+
+    expected_status = 'processing'
+
+    obj_id, job_id = get_args_objid_jobid(args)
+
+    condition = {'_id': obj_id}
+    cursor = mongo_collection.find(condition)
+    if cursor.count() != 1:
+        raise Exception(util.gen_msg(f"{count} records match {condition}.\n"))
+
+    idx = get_retrievals_idx(job_id, expected_status, cursor[0])
+    prefix = 'retrievals.' + str(idx)
+
+    username = get_current_username(cursor[0])
+
+    result = mongo_collection.update_one(
+        {'_id': obj_id},
+        {'$set': {
+            f'{prefix}.username': username,
+            f'{prefix}.retrieval_status': 'failed',
+            f'{prefix}.when_retrieval_failed': util.get_timestamp()},
+         '$unset': { 'current_user': '' }})
+
+    if not result.acknowledged:
+        raise Exception(util.gen_msg(f"MongoDB update on _id '{obj_id}' not acknowledged."))
+
+    return f"{job_id}: need to update code to retrieve PBS error message here."
 

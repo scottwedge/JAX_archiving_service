@@ -24,7 +24,7 @@ collection = config.mongo['collection']      ## the collection where we will wri
 
 docs = [
     {
-        "_id": bson.objectid.ObjectId("5ec7cac93c9619864cc73e4b"),
+        "_id": bson.objectid.ObjectId("5ec7cac93c9619864cc73e4a"),
         "managerUserId": "pi1",
         "userId": "postdoc1",
         "projectName": "Project 1",
@@ -51,7 +51,7 @@ docs = [
         "user_metadata": {"band": "megadeath", "genre": "smooth jaz"},
     },
     {
-        "_id": bson.objectid.ObjectId("5ec7cac93c9619864cc73e4c"),
+        "_id": bson.objectid.ObjectId("5ec7cac93c9619864cc73e4b"),
         "managerUserId": "pi2",
         "userId": "postdoc2",
         "projectName": "Project 2",
@@ -78,7 +78,7 @@ docs = [
         "user_metadata": {"status": "on the lamb"},
     },
     {
-        "_id": bson.objectid.ObjectId("5ec7cac93c9619864cc73e4d"),
+        "_id": bson.objectid.ObjectId("5ec7cac93c9619864cc73e4c"),
         "managerUserId": "pi3",
         "userId": "postdoc3",
         "projectName": "Project 3",
