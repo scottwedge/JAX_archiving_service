@@ -2,6 +2,7 @@
 
 import pymongo
 import bson.objectid
+import json
 
 ## local imports:
 
@@ -9,42 +10,85 @@ import config
 import util
 
 
-def get_permitted_records_list(user_dict, cursor):
+def record_permitted(record, user_dict):
+    '''
+    Returns True if user has permissions on record; else False
+    '''
 
-    records = []
-
-    if user_dict.get('admin'): 
-        for record in cursor:
-            records.append(record)
-        return records
+    if user_dict.get('admin'):
+        return True
 
     user_groups_list = user_dict.get('groups_list')
+
     if not isinstance(user_groups_list, list):
         raise Exception(util.gen_msg(
             f"user_dict['groups_list'] '{user_groups_list}' is not a list; user_dict: '{user_dict}'"
         ))
 
+    if 'system_groups' not in record:
+        util.log_email(util.gen_msg(
+            f"record has no system_groups key; record: '{record}'"
+        ))
+        return False
+
+    allowed_groups_list = record.get('system_groups')
+
+    if not isinstance(allowed_groups_list, list):
+        util.log_email(util.gen_msg(
+            f"record['groups_list'] '{allowed_groups_list}' is not a list; record: '{record}'"
+        ))
+
+    for group in allowed_groups_list:
+        if group in user_groups_list:
+            return True
+
+    return False
+
+
+def get_permitted_records_list(user_dict, cursor, start_after_id=None, limit=float("inf")):
+
+    records = []
+
+    if start_after_id: 
+        found_start = False
+    else: 
+        found_start = True
+
     for record in cursor:
-        if 'system_groups' not in record:
-            util.log_email(util.gen_msg(
-                f"record has no system_groups key; record: '{record}'"
-            ))
-            continue
-        allowed_groups_list = record.get('system_groups')
-        if not isinstance(allowed_groups_list, list):
-            util.log_email(util.gen_msg(
-                f"record['groups_list'] '{allowed_groups_list}' is not a list; record: '{record}'"
-            ))
-        for group in allowed_groups_list:
-            if group in user_groups_list:
+
+        if found_start:
+            if record_permitted(record, user_dict):
                 records.append(record)
-                break
+            if len(records) >= limit:
+                return records
+        else:   
+            if '_id' not in record:
+                raise Exception("_id field not returned by query filter.")
+
+            id1 = str(record.get("_id"))
+            if id1 == start_after_id:
+                found_start = True
 
     return records
 
 
 def get_documents(args, user_dict, mongo_collection):
-    return user_dict
+
+    condition = args.get('find')
+    limit = args.get('limit')
+    last = args.get('last')
+
+    try:
+        condition = json.loads(condition)
+    except Exception as e:
+        raise Exception(util.gen_msg(f"Could not parse dict from '{condition}'."))
+
+    cursor = mongo_collection.find(condition)
+
+    records = get_permitted_records_list(user_dict, cursor, start_after_id=last, limit=limit)
+    records = json.dumps(records)
+
+    return f"type(records): '{type(records)}'; condition: '{condition}'; limit: '{limit}'; last: '{last}'"
 
 
 def get_document_by_objectid(args, user_dict, mongo_collection):
@@ -72,7 +116,7 @@ def get_document_by_objectid(args, user_dict, mongo_collection):
     doc = records_list[0]
     doc['_id'] = str(doc.get('_id'))
 
-    return doc
+    return json.dumps(doc)
 
 
 def get_last_document(args, user_dict, mongo_collection):
@@ -85,6 +129,6 @@ def get_last_document(args, user_dict, mongo_collection):
     doc = cursor[0]
     doc['_id'] = str(doc.get('_id'))
 
-    return doc
+    return json.dumps(doc)
 
 
