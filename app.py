@@ -7,6 +7,7 @@ import markupsafe
 import config
 import util
 import status_updater
+import document_getter
 
 ## init mongodb collection object for config.mongo['collection']; 
 ##   then can pass collection object to modules that need it:
@@ -167,7 +168,7 @@ def retrieve_failed_url():
         user_dict = util.get_api_user(args)
         if not user_dict.get('admin'):
             raise Exception("/retrieve_failed is only available to admins.")
-        value = status_updater.retriev_failed(args, user_dict, mongo_collection)
+        value = status_updater.retrieve_failed(args, user_dict, mongo_collection)
     except Exception as e:
         msg = f"ERROR: from /retrieve_failed: {e}"
         util.log_email(msg, error=True)
@@ -177,21 +178,50 @@ def retrieve_failed_url():
 
 
 @app.route("/get_documents", methods=['GET'])
-def get_documents():
-    url = "/get_documents"
-    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+def get_documents_url():
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        value = document_getter.get_documents(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /get_documents: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
 
 
 @app.route("/get_document_by_objectid", methods=['GET'])
-def get_document_by_objectid():
-    url = "/get_document_by_objectid"
-    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+def get_document_by_objectid_url():
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        value = document_getter.get_document_by_objectid(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /get_document_by_objectid: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
 
 
 @app.route("/get_last_document", methods=['GET'])
-def get_last_document():
-    url = "/get_last_document"
-    return f"ERROR: reached unimplemented route '{url}'; args: '{dict(flask.request.args)}'"
+def get_last_document_url():
+
+    try:
+        args = dict(flask.request.args)
+        user_dict = util.get_api_user(args)
+        if not user_dict.get('admin'):
+            raise Exception("/get_last_document is only available to admins.")
+        value = document_getter.get_last_document(args, user_dict, mongo_collection)
+    except Exception as e:
+        msg = f"ERROR: from /get_last_document: {e}"
+        util.log_email(msg, error=True)
+        return msg
+
+    return value
 
 
 ## for now, just for testing/demo flask:

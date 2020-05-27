@@ -23,7 +23,7 @@ port = '5000'
 
 def build_url(api_key=None, obj_id=None, job_id=None, protocol=protocol, port=port):
 
-    route = f'retrieve_queued'
+    route = f'retrieve_failed'
 
     param_list = []
     if api_key: param_list.append(f"api_key={api_key}")
