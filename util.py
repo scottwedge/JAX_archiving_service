@@ -22,7 +22,7 @@ else:
 
 # this is more of a stub for now until the collection is
 # named in the config file
-collection = config.collection
+collection = config.mongo["collection"]
 
 
 def get_timestamp(format=config.time["format_sec"], zone=config.time["zone"]):

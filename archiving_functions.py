@@ -23,7 +23,7 @@ from util import (
 
 # this is more of a stub for now until the collection is
 # named in the config file
-collection = config.collection
+collection = config.mongo["collection"]
 
 
 def build_archived_path_faculty(pi, submitter, project):
