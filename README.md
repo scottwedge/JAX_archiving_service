@@ -62,9 +62,9 @@ A dictionary (in python or equivalent in other language) with the following requ
 ---
 ExaMple of [metadata][metadata_mongo_ready] when ready for insertion into mongoDB.
 
-Example of [metadata][metadata_inserted] when initially inserted into mongoDB.
+Example of [metadata][metadata_inserted] after inserted into mongoDB.
 
-Example of [metadata][metadata_archive_queued] right after request is submitted to pbs and pbs returns a `job_id`.
+Example of [metadata][metadata_submitted_to_pbs] after request is submitted to pbs and pbs returns a `job_id`.
 
 ---
 ##### Flow of actions
@@ -191,10 +191,10 @@ The return value is a list of documents specified by the args. This `GET` will i
 
 ### /get_document_by_objectid
 
-The return value is the document corresponding to the specified `object_id`. This `GET` will include two args `api_key` and `object_id`.
+The return value is the document corresponding to the specified `obj_id`. This `GET` will include two args `api_key` and `obj_id`.
 - `api_key`
    - Value is the string representing the key
-- `object_id`
+- `obj_id`
    - string value of the object id you want to query
 
 
@@ -553,6 +553,7 @@ print(response.json())
 [metadata_link]: #metadata
 [metadata_mongo_ready]: metadata.md#metadata-when-ready-for-mongodb
 [metadata_inserted]: metadata.md#metadata-after-initially-inserted
+[metadata_submitted_to_pbs]: metadata.md#metadata-after-submitted-to-pbs
 [metadata_archive_queued]: metadata.md#metadata-archive-queued
 [metadata_archive_processing]: metadata.md#metadata-archive-processing
 [metadata_archive_pre_completed]: metadata.md#metadata-archive-pre-completed

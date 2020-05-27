@@ -1,6 +1,9 @@
 ### Examples of metadata state at various stages of archiving and retrieving
 
 ---
+#### Sequence of status updates for `archival_status` key during archiving process:
+`processing_metadata` -> `ready_for_pbs` -> `submitted` -> `queued` -> `processing` -> `completed`
+---
 #### Metadata when ready for mongoDB
 Example of metadata when initially inserted into mongoDB
 ```
@@ -61,7 +64,41 @@ Example of metadata when initially inserted into mongoDB
     "when_archival_started": null,
     "when_archival_completed": null,
     "failed_multiple": null,
-    "archival_status": "ready_to_submit",
+    "archival_status": "ready_for_pbs",
+    "user_metadata": {},
+}
+```
+
+Back to [archive][metadata_link]
+
+---
+#### Metadata after submitted to pbs
+Example of metadata right after `submit_to_pbs()`
+```
+{
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
+    "classification": "topSecret",
+    "grant_id": "NA",
+    "notes": "Who needs notes?",
+    "request_type": "faculty",
+    "system_groups": ["jaxuser"],
+    "submitter": {
+        "fname": "post",
+        "lname": "doc",
+        "username": "pdoc",
+        "email": "post.doc@jax.org"
+    },
+    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "ready_for_pbs": false,
+    "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
+    "when_archival_queued": null,
+    "when_archival_started": null,
+    "when_archival_completed": null,
+    "failed_multiple": null,
+    "archival_status": "submitted",
     "user_metadata": {},
 }
 ```

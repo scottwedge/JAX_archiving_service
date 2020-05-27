@@ -6,6 +6,7 @@ import inspect
 import smtplib
 import subprocess
 import urllib.parse
+from bson.objectid import ObjectId
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -19,8 +20,12 @@ if config.testing["mongo_on"]:
 else:
     import mocks.pymongo_mock
 
+# this is more of a stub for now until the collection is
+# named in the config file
+collection = config.collection
 
-def get_timestamp(format=config.time['format_sec'], zone=config.time['zone']):
+
+def get_timestamp(format=config.time["format_sec"], zone=config.time["zone"]):
     """
     Returns a timestamp (str) with the current time.
     Argument(s):
@@ -32,7 +37,7 @@ def get_timestamp(format=config.time['format_sec'], zone=config.time['zone']):
     zone = pytz.timezone(zone)
     ts = zone.localize(datetime.datetime.now())
     return ts.strftime(format)
-    
+
 
 def get_mongo_client():
 
@@ -148,6 +153,10 @@ def get_api_user(args_dict):
     user_info = config.api_keys.get(api_key)
     if not user_info:
         raise Exception(gen_msg("invalid api_key"))
+    else:
+        # log the authenticated key and delete from args
+        log_email(f"api_key: '{api_key}' authenticated.")
+        del args_dict["api_key"]
 
     try:
         groups_string = subprocess.getoutput(f"id -Gn {user_info['userid']}")
@@ -164,7 +173,7 @@ def process_key(key, mydict):
     replaced = False
     for symbol in symbols:
         if symbol in key:
-            log_email(f"Found illegal character. Will remove {symbol} from {key}")
+            log_email(f"Illegal char found, removing {symbol} from {key}")
             new_key = key.replace(symbol, "")
             replaced = True
     if replaced:
@@ -183,11 +192,8 @@ def scrub_dict_keys(dictionary):
 
 def mongo_delete_doc(key, val, collection):
     query = {"_id": ObjectId(val)} if "_id" == key else {key: val}
-    # if "_id" == key:
-    #     query = {"_id": ObjectId(val)}
-    # else:
-    #     query = {key: val}
     collection.delete_one(query)
+    log_email(f"Deleting")
     return
 
 
@@ -199,8 +205,22 @@ def mongo_update_by_key(key, val, modify_key, modify_val, collection):
     return result.modified_count
 
 
+def mongo_set(key, val, to_set, collection):
+    query = {"_id": ObjectId(val)} if "_id" == key else {key: val}
+    result = collection.update_one(query, {"$set": to_set})
+    assert result.acknowledged
+    return result.modified_count
+
+
+def mongo_set_unset(key, val, to_set, to_unset, collection):
+    query = {"_id": ObjectId(val)} if "_id" == key else {key: val}
+    result = collection.update_one(query, {"$set": to_set, "$unset": to_unset})
+    assert result.acknowledged
+    return result.modified_count
+
+
 def add_current_user(user: dict, obj_id: str, collection):
-    query = {"_id": ObjectId(object_id)}
+    query = {"_id": ObjectId(obj_id)}
     new_val = {"$set": {"current_user": user}}
     result = collection.update_one(query, new_val)
     assert result.acknowledged
@@ -217,59 +237,41 @@ def mongo_ingest(metadata, collection):
         if not document:
             metadata.update(
                 {
-                    "ready_for_pbs": True,
                     "when_ready_for_pbs": get_timestamp(),
+                    "when_submitted_to_pbs": None,
                     "when_archival_queued": None,
                     "when_archival_started": None,
                     "when_archival_completed": None,
                     "failed_multiple": False,
-                    "archival_status": "ready_to_submit",
                 }
             )
             metadata = scrub_dict_keys(metadata)
-            inserted_id = op_collection.insert_one(metadata).inserted_id
+            inserted_id = collection.insert_one(metadata).inserted_id
             log_email(f"Metadata inserted with id: {inserted_id}")
             metadata["_id"] = str(inserted_id)
             return metadata
 
         elif (
             "failed" in document["archival_status"]
-            and document["failed_multiple"] != True
-        ):
-            mongo_update_by_key(
-                "archivedPath", metadata["archivedPath"], "ready_for_pbs", True
-            )
-            mongo_update_by_key(
-                "archivedPath", metadata["archivedPath"], "failed_multiple", True
+            and document["failed_multiple"] is not True
+        ):  # failed 1 time previously, allow this 1 retry
+            mongo_set(
+                "archivedPath",
+                metadata["archivedPath"],
+                {"archival_status": "ready_for_pbs", "failed_multiple": True},
+                collection,
             )
 
             document = collection.find_one({"archivedPath": metadata["archivedPath"]})
             return document
 
-        elif (
-            "dry_run" in document["archival_status"]
-            and document["failed_multiple"] != True
-        ):
-            mongo_update_by_key(
-                "archivedPath", metadata["archivedPath"], "ready_for_pbs", True
-            )
-            # mongo_update_by_key(
-            #     "archivedPath",
-            #     metadata["archivedPath"],
-            #     "when_ready_for_pbs",
-            #     get_timestamp(),
-            # )
+        elif "dry_run" in document["archival_status"]:  # do nothing, return document
             return document
 
-        else:
-            mongo_update_by_key(
-                "archivedPath", metadata["archivedPath"], "ready_for_pbs", False
-            )
-            log_email(
-                f"Metadata ingestion skipped because {metadata['archivedPath']} already in Mongo"
-            )
-            return document
+        else:  # already archived and not a dry_run
+            msg = f"{metadata['archivedPath']} already in Mongo."
+            log_email(msg)
+            raise Exception(msg)
 
     except Exception as e:
-        log_email(f"Metadata insertion failed with error: {e}")
-        return metadata
+        raise Exception(f"Metadata insertion failed with error: {e}")
