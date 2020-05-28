@@ -1,26 +1,15 @@
 import config
 import datetime as dt
 import flask
-import json
-import os
-import requests
 import subprocess
-import time
-
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
-from jsonschema import validate
+
+# from jsonschema import validate
 from mongo_utils import mongo_set, mongo_set_unset, mongo_delete_doc, mongo_ingest
 from typing import Optional
-from util import (
-    get_mongo_collection,
-    get_timestamp,
-    log_email,
-    mongo_ingest,
-    mongo_set,
-    mongo_set_unset,
-)
+from util import get_timestamp, log_email
 
 # this is more of a stub for now until the collection is
 # named in the config file

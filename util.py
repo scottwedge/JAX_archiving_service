@@ -1,16 +1,15 @@
-## unconditional global imports:
+# unconditional global imports:
 import sys
 import datetime
 import pytz
 import inspect
 import smtplib
 import subprocess
-import urllib.parse
 from bson.objectid import ObjectId
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-## unconditional local imports:
+# unconditional local imports:
 import config
 from logger import LOGGER
 
@@ -38,17 +37,18 @@ def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
     # Text in subject line
     msg["Subject"] = subject
     msg.attach(MIMEText(body, "plain"))
-    msg_text = msg.as_string()
+    msg_txt = msg.as_string()
     try:
-        with smtplib.SMTP("smtp.jax.org", 25) as server:
+        with smtplib.SMTP("smtp.jax.org", 25) as svr:
             # 1st arg overwritten by msg["From"] above
             # 2nd arg is list of recipients and who actually receives the email
             # 3rd arg body of email
             # result will return an empty dict when server does not refuse any
             # recipient. Returns dict of refused emails otherwise
-            result = server.sendmail("return-email@jax.org", recipients, msg_text)
+            result = svr.sendmail("return-email@jax.org", recipients, msg_txt)
             if result:
-                err_msg = f"ERROR: The following recipients were refused, {result}"
+                err_msg = f"ERROR: The following recipients were refused, "
+                +"{result}"
                 LOGGER.error(err_msg)
                 sys.stderr.write(err_msg)
     except Exception as e:

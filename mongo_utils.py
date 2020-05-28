@@ -54,7 +54,8 @@ def get_mongo_collection(
         collection_obj = db_obj[collection_name]
     except Exception as e:
         log_email(
-            f"ERROR: could not connect to collection '{database_name}.{collection_name}': {e}"
+            f"ERROR: could not connect to collection "
+            + f"'{database_name}.{collection_name}': {e}"
         )
         return None
 
@@ -84,12 +85,13 @@ def mongo_delete_doc(key, val, collection):
 
 def mongo_ingest(metadata, collection):
     """
-    dict must be entire body of post request where one of the top-level keys
-    is "metadata" which has for its value a dict containing the metadata to ingest
+    dict must be entire body of post request where one of the top-level
+    keys is "metadata" which has for its value a dict containing the
+    metadata to ingest
     """
-    document = collection.find_one({"archivedPath": metadata["archivedPath"]})
+    doc = collection.find_one({"archivedPath": metadata["archivedPath"]})
     try:
-        if not document:
+        if not doc:
             metadata.update(
                 {
                     "when_ready_for_pbs": get_timestamp(),
@@ -106,9 +108,8 @@ def mongo_ingest(metadata, collection):
             metadata["_id"] = str(inserted_id)
             return metadata
 
-        elif (
-            "failed" in document["archival_status"]
-            and document["failed_multiple"] is not True
+        elif ("failed" in doc["archival_status"]) and (
+            doc["failed_multiple"] is not True
         ):  # failed 1 time previously, allow this 1 retry
             mongo_set(
                 "archivedPath",
@@ -117,11 +118,11 @@ def mongo_ingest(metadata, collection):
                 collection,
             )
 
-            document = collection.find_one({"archivedPath": metadata["archivedPath"]})
-            return document
+            doc = collection.find_one({"archivedPath": metadata["archivedPath"]})
+            return doc
 
-        elif "dry_run" in document["archival_status"]:  # do nothing, return document
-            return document
+        elif "dry_run" in doc["archival_status"]:  # do nothing, return doc
+            return doc
 
         else:  # already archived and not a dry_run
             msg = f"{metadata['archivedPath']} already in Mongo."
