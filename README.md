@@ -140,6 +140,8 @@ Example of `current_user` in metadata while retrieval is processing
 ---
 Example of [metadata][metadata_retrieve_ready] when request is ready for submission to pbs.
 
+Example of [metadata][metadata_retrieve_submitted] just after request submitted to pbs.
+
 ##### Flow of retrieve actions
 1. Integer value corresponding to the number of directories submitted for retrieval is returned. Metadata for each document associated with an `obj_id` is updated with a `current_user` and a `retrievals` key who's value is a listr of dicts. Each dict is a retrieval event. At this point the `retrievals` status is `ready_for_pbs` and a timestamp present for `when_ready_for_pbs`.
 2. After request is submitted to pbs, metadata is updated with `job_id`, user receives an email notification about request being submitted to the queue.
@@ -560,6 +562,7 @@ print(response.json())
 [metadata_archive_completed]: metadata.md#metadata-archive-completed
 [metadata_archive_failed]: metadata.md#metadata-archive-failed
 [metadata_retrieve_ready]: metadata.md#metadata-retrieve-request-ready
+[metadata_retrieve_submitted]: metadata.md#metadata-retrieve-request-submitted
 [metadata_retrieve_queued]: metadata.md#metadata-retrieve-queued
 [metadata_retrieve_processing]: metadata.md#metadata-retrieve-processing
 [metadata_retrieve_success]: metadata.md#metadata-retrieve-success
