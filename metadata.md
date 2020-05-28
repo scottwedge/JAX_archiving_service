@@ -1,6 +1,9 @@
 ### Examples of metadata state at various stages of archiving and retrieving
 
 ---
+#### Sequence of status updates for `archival_status` key during archiving process:
+`processing_metadata` -> `ready_for_pbs` -> `submitted` -> `queued` -> `processing` -> `completed`
+---
 #### Metadata when ready for mongoDB
 Example of metadata when initially inserted into mongoDB
 ```
@@ -23,6 +26,7 @@ Example of metadata when initially inserted into mongoDB
     "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": true,
     "when_ready_for_pbs": null,
+    "when_submitted_to_pbs": null,
     "when_archival_queued": null,
     "when_archival_started": null,
     "when_archival_completed": null,
@@ -57,11 +61,47 @@ Example of metadata when initially inserted into mongoDB
     "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
+    "when_submitted_to_pbs": null,
     "when_archival_queued": null,
     "when_archival_started": null,
     "when_archival_completed": null,
     "failed_multiple": null,
-    "archival_status": "ready_to_submit",
+    "archival_status": "ready_for_pbs",
+    "user_metadata": {},
+}
+```
+
+Back to [archive][metadata_link]
+
+---
+#### Metadata after submitted to pbs
+Example of metadata right after `submit_to_pbs()`
+```
+{
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
+    "classification": "topSecret",
+    "grant_id": "NA",
+    "notes": "Who needs notes?",
+    "request_type": "faculty",
+    "system_groups": ["jaxuser"],
+    "submitter": {
+        "fname": "post",
+        "lname": "doc",
+        "username": "pdoc",
+        "email": "post.doc@jax.org"
+    },
+    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "ready_for_pbs": false,
+    "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
+    "when_submitted_to_pbs": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_queued": null,
+    "when_archival_started": null,
+    "when_archival_completed": null,
+    "failed_multiple": null,
+    "archival_status": "submitted",
     "user_metadata": {},
 }
 ```
@@ -91,7 +131,8 @@ Example of metadata when initially inserted into mongoDB
     "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
-    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_submitted_to_pbs": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_queued": "2019-12-31 22:41:02 EDT-0400",
     "when_archival_started": null,
     "when_archival_completed": null,
     "failed_multiple": null,
@@ -126,7 +167,8 @@ Example of metadata state when `/archive_processing` updates metadata
     "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
-    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_submitted_to_pbs": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_queued": "2019-12-31 22:41:02 EDT-0400",
     "when_archival_started": "2019-12-31 22:44:08 EDT-0400",
     "when_archival_completed": null,
     "failed_multiple": null,
@@ -161,7 +203,8 @@ Example of metadata state when `/archive_success` updates metadata
     "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
-    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_submitted_to_pbs": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_queued": "2019-12-31 22:41:02 EDT-0400",
     "when_archival_started": "2019-12-31 22:44:08 EDT-0400",
     "when_archival_completed": "2020-01-01 03:01:59 EDT-0400",
     "failed_multiple": null,
@@ -214,6 +257,7 @@ Example of metadata when archiving is completed
     "submission": {
         "job_id": "8638.ctarchive.jax.org",
         "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
+        "when_submitted_to_pbs": "2019-12-31 22:41:01 EDT-0400",
         "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
         "when_archival_started": "2019-12-31 22:44:08 EDT-0400",
         "when_archival_completed": "2020-01-01 03:01:59 EDT-0400"
@@ -247,7 +291,8 @@ Example of metadata state when `/archive_failed` updates metadata. Note that met
     "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
     "ready_for_pbs": false,
     "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
-    "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+    "when_submitted_to_pbs": "2019-12-31 22:41:01 EDT-0400",
+    "when_archival_queued": "2019-12-31 22:41:02 EDT-0400",
     "when_archival_started": "2019-12-31 22:41:02 EDT-0400",
     "when_archival_failed": "2019-12-31 22:46:08 EDT-0400",
     "when_archival_completed": null,
@@ -301,6 +346,7 @@ Example of metadata when request ready for submission to pbs
     "submission": {
         "job_id": "8638.ctarchive.jax.org",
         "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
+        "when_submitted_to_pbs": "2019-12-31 22:41:01 EDT-0400",
         "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
         "when_archival_started": "2019-12-31 22:44:08 EDT-0400",
         "when_archival_completed": "2020-01-01 03:01:59 EDT-0400"
@@ -308,6 +354,67 @@ Example of metadata when request ready for submission to pbs
     "retrievals": [{
     "retrieval_status": "ready_for_pbs",
     "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+    "when_submitted_to_pbs": null,
+    "when_retrieval_queued": null,
+    "when_retrieval_started": null,
+    "when_retrieval_completed": null
+	}]
+}
+```
+
+Back to [`/retrieve`][2]
+
+---
+
+
+#### Metadata retrieve request submitted
+Example of metadata when request ready for submission to pbs
+```
+{
+	"current_user": {
+		"fname": "Research",
+		"lname": "IT",
+		"username": "rit",
+		"email": "rit@jax.org"
+	},
+    "manager_user_id": "pi",
+    "user_id": "postdoc",
+    "project_name": "Nobel Prize Project (NPP)",
+    "classification": "topSecret",
+    "grant_id": "NA",
+    "notes": "Who needs notes?",
+    "request_type": "faculty",
+    "system_groups": ["jaxuser"],
+    "submitter": {
+        "fname": "post",
+        "lname": "doc",
+        "username": "pdoc",
+        "email": "post.doc@jax.org"
+    },
+    "archivedPath": "/archive/faculty/pi-lab/postdoc/2019-12-31/NPP",
+    "source_folder": "/tier2/pi-lab/postdoc/postdoc_NPP",
+    "archival_status": "completed",
+    "submit_progress": [],
+    "archivedSize": {
+        "$numberInt": "396700549"
+    },
+    "dateArchived": "2020-01-01",
+    "sourceSize": {
+        "$numberInt": "797725536"
+    },
+    "user_metadata":{},
+    "submission": {
+        "job_id": "8638.ctarchive.jax.org",
+        "when_ready_for_pbs": "2019-12-31 22:41:00 EDT-0400",
+        "when_submitted_to_pbs": "2019-12-31 22:41:01 EDT-0400",
+        "when_archival_queued": "2019-12-31 22:41:01 EDT-0400",
+        "when_archival_started": "2019-12-31 22:44:08 EDT-0400",
+        "when_archival_completed": "2020-01-01 03:01:59 EDT-0400"
+    },
+    "retrievals": [{
+    "retrieval_status": "ready_for_pbs",
+    "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+    "when_submitted_to_pbs": "2020-01-02 07:34:39 EDT-0400",
     "when_retrieval_queued": null,
     "when_retrieval_started": null,
     "when_retrieval_completed": null
@@ -366,7 +473,8 @@ Example of metadata after request successfully queued
     "job_id": "8649.ctarchive.jax.org",
     "retrieval_status": "queued",
     "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
-    "when_retrieval_queued": "2020-01-02 07:34:39 EDT-0400",
+    "when_submitted_to_pbs": "2020-01-02 07:34:39 EDT-0400",
+    "when_retrieval_queued": "2020-01-02 07:34:40 EDT-0400",
     "when_retrieval_started": null,
     "when_retrieval_completed": null
 	}]
@@ -424,7 +532,8 @@ Example of metadata after job begins processing
     "job_id": "8649.ctarchive.jax.org",
     "retrieval_status": "processing",
     "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
-    "when_retrieval_queued": "2020-01-02 07:34:39 EDT-0400",
+    "when_submitted_to_pbs": "2020-01-02 07:34:39 EDT-0400",
+    "when_retrieval_queued": "2020-01-02 07:34:40 EDT-0400",
     "when_retrieval_started": "2020-01-02 07:36:25 EDT-0400",
     "when_retrieval_completed": null
 	}]
@@ -476,7 +585,8 @@ Example of metadata after retrieve job completes
     "job_id": "8649.ctarchive.jax.org",
     "retrieval_status": "completed",
     "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
-    "when_retrieval_queued": "2020-01-02 07:34:39 EDT-0400",
+    "when_submitted_to_pbs": "2020-01-02 07:34:39 EDT-0400",
+    "when_retrieval_queued": "2020-01-02 07:34:40 EDT-0400",
     "when_retrieval_started": "2020-01-02 07:36:25 EDT-0400",
     "when_retrieval_completed": "2020-01-02 13:42:53 EDT-0400",
 	}]
@@ -527,8 +637,11 @@ Example of metadata when retrieval fails
     "retrievals": [{
     "job_id": "8649.ctarchive.jax.org",
     "retrieval_status": "failed",
-    "when_retrieval_queued": "2020-03-30 12:32:14 EDT-0400",
+    "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+    "when_submitted_to_pbs": "2020-01-02 07:34:39 EDT-0400",
+    "when_retrieval_queued": "2020-01-02 07:34:40 EDT-0400",
     "when_retrieval_started": "2020-03-30 12:32:15 EDT-0400",
+    "when_retrieval_failed": "2020-03-30 12:39:27 EDT-0400",
     "when_retrieval_completed": null
   }]
 }

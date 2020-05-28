@@ -5,6 +5,8 @@
 
 # API Documentation
 
+#### [Archiving Overview Diagram][archiving_diagram]
+
 ## Endpoints
 
 - [`/archive`][archive]
@@ -60,9 +62,9 @@ A dictionary (in python or equivalent in other language) with the following requ
 ---
 ExaMple of [metadata][metadata_mongo_ready] when ready for insertion into mongoDB.
 
-Example of [metadata][metadata_inserted] when initially inserted into mongoDB.
+Example of [metadata][metadata_inserted] after inserted into mongoDB.
 
-Example of [metadata][metadata_archive_queued] right after request is submitted to pbs and pbs returns a `job_id`.
+Example of [metadata][metadata_submitted_to_pbs] after request is submitted to pbs and pbs returns a `job_id`.
 
 ---
 ##### Flow of actions
@@ -138,6 +140,8 @@ Example of `current_user` in metadata while retrieval is processing
 ---
 Example of [metadata][metadata_retrieve_ready] when request is ready for submission to pbs.
 
+Example of [metadata][metadata_retrieve_submitted] just after request submitted to pbs.
+
 ##### Flow of retrieve actions
 1. Integer value corresponding to the number of directories submitted for retrieval is returned. Metadata for each document associated with an `obj_id` is updated with a `current_user` and a `retrievals` key who's value is a listr of dicts. Each dict is a retrieval event. At this point the `retrievals` status is `ready_for_pbs` and a timestamp present for `when_ready_for_pbs`.
 2. After request is submitted to pbs, metadata is updated with `job_id`, user receives an email notification about request being submitted to the queue.
@@ -189,10 +193,10 @@ The return value is a list of documents specified by the args. This `GET` will i
 
 ### /get_document_by_objectid
 
-The return value is the document corresponding to the specified `object_id`. This `GET` will include two args `api_key` and `object_id`.
+The return value is the document corresponding to the specified `obj_id`. This `GET` will include two args `api_key` and `obj_id`.
 - `api_key`
    - Value is the string representing the key
-- `object_id`
+- `obj_id`
    - string value of the object id you want to query
 
 
@@ -525,6 +529,8 @@ print(response.json())
 
 ## Archiving General Overall Diagram
 
+[back to top][endpoints]
+
 ![archiving diagram](https://github.com/TheJacksonLaboratory/JAX_archiving_service/blob/frank/Archiving_Diagram_JAS.png "Archiving Diagram")
 
 
@@ -549,13 +555,16 @@ print(response.json())
 [metadata_link]: #metadata
 [metadata_mongo_ready]: metadata.md#metadata-when-ready-for-mongodb
 [metadata_inserted]: metadata.md#metadata-after-initially-inserted
+[metadata_submitted_to_pbs]: metadata.md#metadata-after-submitted-to-pbs
 [metadata_archive_queued]: metadata.md#metadata-archive-queued
 [metadata_archive_processing]: metadata.md#metadata-archive-processing
 [metadata_archive_pre_completed]: metadata.md#metadata-archive-pre-completed
 [metadata_archive_completed]: metadata.md#metadata-archive-completed
 [metadata_archive_failed]: metadata.md#metadata-archive-failed
 [metadata_retrieve_ready]: metadata.md#metadata-retrieve-request-ready
+[metadata_retrieve_submitted]: metadata.md#metadata-retrieve-request-submitted
 [metadata_retrieve_queued]: metadata.md#metadata-retrieve-queued
 [metadata_retrieve_processing]: metadata.md#metadata-retrieve-processing
 [metadata_retrieve_success]: metadata.md#metadata-retrieve-success
 [metadata_retrieve_failed]: metadata.md#metadata-retrieve-failed
+[archiving_diagram]: #archiving-general-overall-diagram
