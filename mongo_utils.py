@@ -1,9 +1,13 @@
-## unconditional local imports:
-import config
-from logger import LOGGER
-from util import scrub_dict_keys
+# unconditional global imports:
+import urllib.parse
+from bson.objectid import ObjectId
 
-## imports conditional on config:
+# unconditional local imports:
+import config
+
+from util import get_timestamp, log_email, scrub_dict_keys
+
+# imports conditional on config:
 if config.testing["mongo_on"]:
     import pymongo
 else:
@@ -17,17 +21,17 @@ def get_mongo_client():
     try:
         user = urllib.parse.quote_plus(
             config.mongo.get("user")
-        )  ## percent-escape string
+        )  # percent-escape string
         passwd = urllib.parse.quote_plus(
             config.mongo.get("passwd")
-        )  ## percent-escape string
+        )  # percent-escape string
         host = config.mongo.get("host")
         port = config.mongo.get("port")
         uri = f"mongodb://{user}:{passwd}@{host}:{port}"
         client_obj = pymongo.MongoClient(uri, authSource=config.mongo.get("authdb"))
         client_obj.admin.command(
             "ismaster"
-        )  ## tests for client != None and good connection
+        )  # tests for client != None and good connection
     except Exception as e:
         log_email(f"ERROR: could not connect to '{host}:{port}': {e}")
         return None
@@ -45,7 +49,6 @@ def get_mongo_collection(
         if not client_obj:
             log_email(f"ERROR: get_mongo_client() failed.")
             return None
-
     try:
         db_obj = client_obj[database_name]
         collection_obj = db_obj[collection_name]
