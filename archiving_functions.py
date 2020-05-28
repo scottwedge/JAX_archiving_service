@@ -1,14 +1,15 @@
 import config
 import datetime as dt
 import flask
+import os
 import subprocess
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
-
-# from jsonschema import validate
-from mongo_utils import mongo_set, mongo_set_unset, mongo_delete_doc, mongo_ingest
 from typing import Optional
+
+
+from mongo_utils import mongo_set, mongo_set_unset, mongo_delete_doc, mongo_ingest
 from util import get_timestamp, log_email
 
 # this is more of a stub for now until the collection is
@@ -90,6 +91,49 @@ def insert_archived_path(metadata):
             service_name, service_path
         )
     return metadata
+
+
+def validate_source_path(*, action: str, path: str, parent: Optional[str] = None):
+    assert path, f"{action} source path ({path}) must not be empty"
+    path = Path(path)
+    assert path.is_absolute(), f"{action} source path ({path}) must be an absolute path"
+    assert path.is_dir(), f"{action} source path ({path}) is not a directory"
+    if parent:
+        parent = Path(parent)
+        assert (
+            parent.exists() and parent.is_absolute()
+        ), f"Parent directory {parent} isn't absolute"
+        assert path.relative_to(parent), f"{path} does not begin with '{parent}'"
+    if action == "archive":
+        log_email(f"{path} will be archived")
+    else:
+        log_email(f"{path} will be retrieved from the archive")
+    return str(path)
+
+
+def validate_destination_path(*, action: str, path: str, parent: Optional[str] = None):
+    assert path, f"{action} destination path ({path}) must not be empty"
+    LOGGER.debug(f"recieved path: {path}")
+    path = Path(path)
+    assert (
+        path.is_absolute()
+    ), f"{action} destination path ({path}) must be an absolute path"
+    if action != "retrieve":
+        assert not path.exists(), f"{action} destination path ({path}) must not exist"
+        if path.exists():
+            LOGGER.debug(f"path for {action} request {path} exists")
+            return False
+    if parent:
+        parent = Path(parent)
+        assert (
+            parent.exists() and parent.is_absolute()
+        ), f"Parent directory {parent} isn't absolute"
+        assert path.relative_to(parent), f"{path} does not begin with '{parent}'"
+    if action == "archive":
+        LOGGER.debug(f"archiver will deposit files at {path}")
+    else:
+        LOGGER.debug(f"archiver will retrieve files to {path}")
+    return str(path)
 
 
 def completion_notification_body(
@@ -214,8 +258,8 @@ def process_metadata(json_arg, api_user):
     return metadata
 
 
-def is_valid_for_pbs(metadata, collection):
-    document = collection.find_one({"archivedPath": metadata["archivedPath"]})
+def is_valid_for_pbs(archivedPath, collection):
+    document = collection.find_one({"archivedPath": archivedPath})
     if document:
         if document["archival_status"] == "ready_for_pbs":
             return True
@@ -244,8 +288,9 @@ def submit_to_pbs(
         else:
             raise ValueError("error submitting job: " + e.decode())
     except Exception as e:
-        log_email(f"pbs error: {e}")
-        return
+        msg = f"pbs error: {e}"
+        log_email(msg)
+        return msg
 
     log_email(f"Submitted to PBS: {job_id}\nstderr:{e.decode()}\nstdout:{o.decode()}")
     return job_id
@@ -295,32 +340,56 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
     except Exception as e:
         return {"message": f"Error ingesting metadata: {e}"}, 400
 
-    try:  # parse input for submitting to pbs
-        input = {
-            "source_dir": metadata["source_folder"],
-            "archive_dest_dir": metadata["archivedPath"],
-        }
+    try:  # validate tentative archivedPath
+        source_path = metadata["source_folder"]
+        destination_path = validate_destination_path(
+            action="archive", path=metadata["archivedPath"], parent="/"
+        )
+        if not destination_path:
+            pass
+            # TODO: create duplicate archive request email body
+            # send_dup_archive_notification(
+            #     input["source_dir"], input["archive_dest_dir"], user
+            # )
+            raise Exception(
+                f"{action} destination path ({input['archive_dest_dir']}) must not exist."
+            )
+
     except Exception as e:
-        return {"message": f"Error while processing input: {e}"}, 400
+        source_path = metadata["source_folder"]
+        destination_path = metadata["archivedPath"]
+        status = metadata["archival_status"]
+        if "completed" not in status:
+            to_set = {
+                "archival_status": "failed",
+                "exception_caught": str(e),
+                "when_archival_failed": get_timestamp(),
+            }
+            mongo_set("archivedPath", destination_path, to_set, collection)
+
+        msg = f"Error while validating tentative archivedPath: {e}"
+        log_email(msg)
+        return {"message": msg}, 400
 
     try:
         if "debug" in json_arg.keys():
             debug = json_arg["debug"]
         if not debug:
-            if is_valid_for_pbs(metadata["archivedPath"]):
+            if is_valid_for_pbs(destination_path):
                 mongo_set(
                     "archivedPath",
-                    metadata["archivedPath"],
+                    destination_path,
                     {"archival_status": "submitting"},
                     collection,
                 )
-                submit_to_pbs(input["source_dir"], input["archive_dest_dir"], "archive")
+                job_id = submit_to_pbs(source_path, destination_path, "archive")
                 mongo_set(
                     "archivedPath",
-                    metadata["archivedPath"],
+                    destination_path,
                     {
                         "archival_status": "submitted",
                         "when_submitted_to_pbs": get_timestamp(),
+                        "job_id": job_id,
                     },
                     collection,
                 )
@@ -353,3 +422,43 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
             )
     except Exception as e:  # noqa: e722
         return {"message": f"Failed to send to queue with error: {e}"}, 400
+
+
+def archive_helper(input: dict, user: dict):
+    action = "archive"
+    # TODO: input from oauth2_jwt
+    try:
+        source_path = input["source_dir"]
+        destination_path = validate_destination_path(
+            action=action, path=input["archive_dest_dir"], parent="/"
+        )
+        if not destination_path:
+            send_dup_archive_notification(
+                input["source_dir"], input["archive_dest_dir"], user
+            )
+            raise Exception(
+                f"{action} destination path ({input['archive_dest_dir']}) must not exist."
+            )
+
+        job_id = submit_to_pbs(source_path, destination_path, action)
+        update_archive_queued(destination_path, job_id)
+        send_queue_notification(action, source_path, user)
+
+    except Exception as e:
+        source_path = input["source_dir"]
+        destination_path = input["archive_dest_dir"]
+        metadata = get_metadata("archivedPath", destination_path)
+        status = metadata["archival_status"]
+        if "completed" not in status:
+            update_metadata_by_key(destination_path, "archival_status", "failed")
+            update_metadata_by_key(destination_path, "exception_caught", str(e))
+        tb = traceback.format_exc()
+        send_completion_notification(
+            action,
+            source_path,
+            destination_path,
+            user,
+            False,
+            exception=str(e),
+            traceback=tb,
+        )

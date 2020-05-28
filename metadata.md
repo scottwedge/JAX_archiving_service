@@ -2,7 +2,9 @@
 
 ---
 #### Sequence of status updates for `archival_status` key during archiving process:
+
 `processing_metadata` -> `ready_for_pbs` -> `submitted` -> `queued` -> `processing` -> `completed`
+
 ---
 #### Metadata when ready for mongoDB
 Example of metadata when initially inserted into mongoDB
@@ -103,6 +105,7 @@ Example of metadata right after `submit_to_pbs()`
     "failed_multiple": null,
     "archival_status": "submitted",
     "user_metadata": {},
+    "job_id": "8638.ctarchive.jax.org",
 }
 ```
 
@@ -138,7 +141,6 @@ Example of metadata when initially inserted into mongoDB
     "failed_multiple": null,
     "archival_status": "queued",
     "user_metadata": {},
-    "job_id": "8638.ctarchive.jax.org",
 }
 ```
 
