@@ -28,7 +28,9 @@ def get_timestamp(format=config.time["format_sec"], zone=config.time["zone"]):
     return ts.strftime(format)
 
 
-def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
+def send_email(recipients, email_content, to="Archive User"):
+    subject = email_content["subject"]
+    body = email_content["body"]
     msg = MIMEMultipart()
     # Who recipient(s) will see the email is from
     msg["From"] = "JAX Archiver <noreply-archiver@jax.org>"
@@ -53,7 +55,6 @@ def send_email(recipients, body, subject="Test Email", to="frank zappulla"):
                 sys.stderr.write(err_msg)
     except Exception as e:
         LOGGER.error(f"error sending email: {e}")
-        pass
 
 
 def gen_msg(msg, error=True):

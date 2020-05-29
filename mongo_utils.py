@@ -14,7 +14,7 @@ else:
     import mocks.pymongo_mock
 
 
-collection = config.mongo["collection"]
+COLLECTION = config.mongo["collection"]
 
 
 def get_mongo_client():
@@ -94,12 +94,13 @@ def mongo_ingest(metadata, collection):
         if not doc:
             metadata.update(
                 {
-                    "when_ready_for_pbs": get_timestamp(),
+                    "when_ready_for_pbs": None,
                     "when_submitted_to_pbs": None,
                     "when_archival_queued": None,
                     "when_archival_started": None,
                     "when_archival_completed": None,
                     "failed_multiple": False,
+                    "archival_status": "processing_metadata",
                 }
             )
             metadata = scrub_dict_keys(metadata)
