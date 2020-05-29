@@ -3,7 +3,7 @@
 ---
 #### Sequence of status updates for `archival_status` key during archiving process:
 
-`processing_metadata` -> `ready_for_pbs` -> `submitted` -> `queued` -> `processing` -> `completed`
+`processing_metadata` -> `validating_archivedPath` -> `ready_for_pbs` -> `submitted` -> `queued` -> `processing` -> `completed`
 
 ---
 #### Metadata when ready for mongoDB
