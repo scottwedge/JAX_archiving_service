@@ -8,9 +8,7 @@ from typing import Optional
 
 
 from mongo_utils import mongo_set, mongo_set_unset, mongo_delete_doc, mongo_ingest
-from util import get_timestamp, log_email
-
-COLLECTION = config.mongo["collection"]
+from util import get_timestamp, log_email, send_email
 
 
 def build_archived_path_faculty(pi, submitter, project):
@@ -306,7 +304,7 @@ def submit_to_pbs(
     return job_id
 
 
-def archive_directory(json_arg, api_user, debug: bool = False) -> None:
+def archive_directory(json_arg, api_user, collection, debug: bool = False) -> None:
     """
     :param json_arg: A decoded JSON string which it at its top level a
     dictionary.  Must have the following keys: requested_dest_dir,
@@ -321,7 +319,7 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
             raise ValueError(request_error)
     except Exception as e:
         log_email(f"Error processing request: {e}")
-        return {"message": f"Error processing request: {e}"}, 400
+        return f"Error processing request: {e}", 400
 
     try:  # validate and preprocess metadata
         metadata = process_metadata(json_arg, api_user)
@@ -330,7 +328,7 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
             raise ValueError(metadata_error)
 
     except Exception as e:
-        return {"message": f"Error processing metadata: {e}"}, 400
+        return f"Error processing metadata: {e}", 400
 
     log_email(
         f"{api_user['fname']} {api_user['lname']} ({api_user['username']}) requesting"
@@ -340,15 +338,12 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
     try:  # create and insert archivedPath
         metadata = insert_archived_path(metadata)
     except Exception as e:
-        return (
-            {"message": f"Error processing and/or inserting archivedPath: {e}"},
-            400,
-        )
+        return (f"Error processing and/or inserting archivedPath: {e}", 400)
 
     try:  # insert metadata into mongoDB
         metadata = mongo_ingest(metadata)
     except Exception as e:
-        return {"message": f"Error ingesting metadata: {e}"}, 400
+        return f"Error ingesting metadata: {e}", 400
 
     try:  # validate tentative archivedPath
         source_path = metadata["source_folder"]
@@ -363,14 +358,13 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
                     "when_ready_for_pbs": get_timestamp(),
                     "archival_status": "ready_for_pbs",
                 },
-                COLLECTION,
+                collection,
             )
         else:  # requested archivedPath not valid
-            pass
-            # TODO: create duplicate archive request email body
-            # send_dup_archive_notification(
-            #     input["source_dir"], input["archive_dest_dir"], user
-            # )
+            send_to_name = (
+                f"{api_user['fname'].capitalize()} {api_user['lname'].capitalize()}"
+            )
+            send_email(api_user["email"], dup_archive_request_body(), send_to_name)
             raise Exception(
                 f"archive destination path '{destination_path}' must not exist."
             )
@@ -388,12 +382,11 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
                     "exception_caught": str(e),
                     "when_archival_failed": get_timestamp(),
                 },
-                COLLECTION,
+                collection,
             )
         msg = f"Error while validating tentative archivedPath: {e}"
-        # TODO: sort out reporting of errors via email
-        # log_email(msg error=True)
-        return {"message": msg}, 400
+        log_email(msg)
+        return msg, 400
 
     try:
         if "debug" in json_arg.keys():
@@ -404,7 +397,7 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
                     "archivedPath",
                     destination_path,
                     {"archival_status": "submitting"},
-                    COLLECTION,
+                    collection,
                 )
                 job_id = submit_to_pbs(source_path, destination_path, "archive")
                 if job_id:  # successfully submitted
@@ -416,7 +409,7 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
                             "when_submitted_to_pbs": get_timestamp(),
                             "job_id": job_id,
                         },
-                        COLLECTION,
+                        collection,
                     )
                     return {"id": str(metadata["_id"])}
                 else:  # failed
@@ -428,78 +421,36 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
                             "when_archival_failed": get_timestamp(),
                             "job_id": job_id,
                         },
-                        COLLECTION,
+                        collection,
                     )
-                    return (
-                        {"message": "Submitting to pbs failed, please see logs."},
-                        400,
-                    )
+                    return "Submitting to pbs failed, please see logs.", 400
 
             else:
                 status = metadata["archival_status"]
-                msg = f"Archive request denied. Current status of {metadata['archivedPath']}: {status}"
-
+                msg = f"Archive request denied. Current status of "
+                +f"{metadata['archivedPath']}: {status}"
                 log_email(msg)
-                return {"message": msg}, 400
+                return msg, 400
         else:
             if "completed" not in metadata["archival_status"]:
                 mongo_set(
                     "archivedPath",
                     metadata["archivedPath"],
                     {"archival_status": "dry_run"},
-                    COLLECTION,
+                    collection,
                 )
                 return (
                     {
                         "message": f"Dry run request, metadata for '{metadata['archivedPath']}'"
                         + " present in mongo and not archived. Request not submitted"
                     },
+                    200,
                 )
             return (
-                {
-                    "message": f"Dry run request and {metadata['archivedPath']}"
-                    + " previously archived. Request not submitted."
-                },
+                f"Dry run request and {metadata['archivedPath']} previously "
+                + "archived. Request not submitted.",
+                200,
             )
+
     except Exception as e:  # noqa: e722
-        return {"message": f"Failed to send to queue with error: {e}"}, 400
-
-
-# def archive_helper(input: dict, user: dict):
-#     action = "archive"
-#     # TODO: input from oauth2_jwt
-#     try:
-#         source_path = input["source_dir"]
-#         destination_path = validate_destination_path(
-#             action=action, path=input["archive_dest_dir"], parent="/"
-#         )
-#         if not destination_path:
-#             send_dup_archive_notification(
-#                 input["source_dir"], input["archive_dest_dir"], user
-#             )
-#             raise Exception(
-#                 f"{action} destination path ({input['archive_dest_dir']}) must not exist."
-#             )
-#
-#         job_id = submit_to_pbs(source_path, destination_path, action)
-#         update_archive_queued(destination_path, job_id)
-#         send_queue_notification(action, source_path, user)
-#
-#     except Exception as e:
-#         source_path = input["source_dir"]
-#         destination_path = input["archive_dest_dir"]
-#         metadata = get_metadata("archivedPath", destination_path)
-#         status = metadata["archival_status"]
-#         if "completed" not in status:
-#             update_metadata_by_key(destination_path, "archival_status", "failed")
-#             update_metadata_by_key(destination_path, "exception_caught", str(e))
-#         tb = traceback.format_exc()
-#         send_completion_notification(
-#             action,
-#             source_path,
-#             destination_path,
-#             user,
-#             False,
-#             exception=str(e),
-#             traceback=tb,
-#         )
+        return f"Failed to send to queue with error: {e}", 400
