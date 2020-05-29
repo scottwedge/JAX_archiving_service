@@ -356,12 +356,15 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
             action="archive", path=metadata["archivedPath"], parent="/"
         )
         if destination_path:
-            to_set = {
-                "when_ready_for_pbs": get_timestamp(),
-                "archival_status": "ready_for_pbs",
-            }
-            mongo_set("archivedPath", destination_path, to_set, COLLECTION)
-
+            mongo_set(
+                "archivedPath",
+                destination_path,
+                {
+                    "when_ready_for_pbs": get_timestamp(),
+                    "archival_status": "ready_for_pbs",
+                },
+                COLLECTION,
+            )
         else:  # requested archivedPath not valid
             pass
             # TODO: create duplicate archive request email body
@@ -377,12 +380,16 @@ def archive_directory(json_arg, api_user, debug: bool = False) -> None:
         destination_path = metadata["archivedPath"]
         status = metadata["archival_status"]
         if "completed" not in status:
-            to_set = {
-                "archival_status": "failed",
-                "exception_caught": str(e),
-                "when_archival_failed": get_timestamp(),
-            }
-            mongo_set("archivedPath", destination_path, to_set, COLLECTION)
+            mongo_set(
+                "archivedPath",
+                destination_path,
+                {
+                    "archival_status": "failed",
+                    "exception_caught": str(e),
+                    "when_archival_failed": get_timestamp(),
+                },
+                COLLECTION,
+            )
         msg = f"Error while validating tentative archivedPath: {e}"
         # TODO: sort out reporting of errors via email
         # log_email(msg error=True)
