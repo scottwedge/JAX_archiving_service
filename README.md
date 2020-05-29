@@ -64,6 +64,8 @@ ExaMple of [metadata][metadata_mongo_ready] when ready for insertion into mongoD
 
 Example of [metadata][metadata_inserted] after inserted into mongoDB.
 
+Example of [metadata][metadata_ready_for_pbs] when ready to submit to pbs.
+
 Example of [metadata][metadata_submitted_to_pbs] after request is submitted to pbs and pbs returns a `job_id`.
 
 ---
@@ -555,6 +557,7 @@ print(response.json())
 [metadata_link]: #metadata
 [metadata_mongo_ready]: metadata.md#metadata-when-ready-for-mongodb
 [metadata_inserted]: metadata.md#metadata-after-initially-inserted
+[metadata_ready_for_pbs]: metadata.md#metadata-when-ready-for-submitting-to-pbs
 [metadata_submitted_to_pbs]: metadata.md#metadata-after-submitted-to-pbs
 [metadata_archive_queued]: metadata.md#metadata-archive-queued
 [metadata_archive_processing]: metadata.md#metadata-archive-processing
