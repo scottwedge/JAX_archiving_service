@@ -274,17 +274,11 @@ def is_valid_for_pbs(archivedPath, collection):
     return False
 
 
-def has_permission(user: dict, metadata: dict):
+def permitted_groups(user: dict, metadata: dict):
     system_groups = metadata.get("system_groups")
     user_groups = user.get("groups_list")
     intersect = user_groups.intersection(system_groups)
-    return True if len(intersect) > 0 else False
-
-
-def get_intersect_groups(user: dict, metadata: dict):
-    system_groups = metadata.get("system_groups")
-    user_groups = user.get("groups_list")
-    return user_groups.intersection(system_groups)
+    return intersect if len(intersect) > 0 else None
 
 
 def submit_to_pbs(
@@ -500,12 +494,12 @@ def retrieve_archived_directory(
             system_groups = metadata.get("system_groups")
             if not system_groups:
                 raise Exception(f"Error getting 'system_groups' for obj_id '{obj_id}'")
-            if not has_permission(api_user, metadata):
+            intersect = permitted_groups(api_user, metadata)
+            if not intersect:
                 log_email(
                     f"user {api_user['username']} does not have permission to retrieve {obj_id}"
                 )
                 continue
-            intersect = get_intersect_groups(api_user, metadata)
             if not debug:
                 job_id = submit_to_pbs(
                     source_path, destination_path, "retrieve", intersect[0], obj_id
