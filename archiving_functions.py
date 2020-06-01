@@ -108,7 +108,7 @@ def validate_source_path(*, action: str, path: str, parent: Optional[str] = None
 
 def validate_destination_path(*, action: str, path: str, parent: Optional[str] = None):
     assert path, f"{action} destination path ({path}) must not be empty"
-    log_email(f"recieved path: {path}")
+    log_email(f"received path: {path}")
     path = Path(path)
     assert (
         path.is_absolute()
