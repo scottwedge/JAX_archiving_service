@@ -1,11 +1,9 @@
-## global imports:
+# global imports:
 
 import pymongo
 import bson.objectid
 
-## local imports:
-
-import config
+# local imports:
 import util
 
 
@@ -51,18 +49,18 @@ def get_documents(args, user_dict, mongo_collection):
     return user_dict
 
 
-def get_document_by_objectid_api(args, user_dict, mongo_collection):
+def get_document_by_objectid(args, user_dict, mongo_collection):
     obj_id = args.get("obj_id")
     if not obj_id:
         raise Exception(util.gen_msg("No obj_id passed."))
-    return get_document_by_objectid(obj_id, user_dict, mongo_collection)
+    return get_document_by_objectid_1(obj_id, user_dict, mongo_collection)
 
 
-def get_document_by_objectid(obj_id, user_dict, mongo_collection):
+def get_document_by_objectid_1(obj_id, user_dict, mongo_collection):
     try:
         id1 = bson.objectid.ObjectId(obj_id)
     except Exception as e:
-        raise Exception(util.gen_msg("obj_id '{obj_id}' not valid: {e}"))
+        raise Exception(util.gen_msg(f"obj_id '{obj_id}' not valid: {e}"))
 
     condition = {"_id": id1}
     cursor = mongo_collection.find(condition)

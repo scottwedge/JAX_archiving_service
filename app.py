@@ -199,11 +199,11 @@ def get_document_by_objectid_url():
     try:
         args = dict(flask.request.args)
         user_dict = util.get_api_user(args)
-        value = document_getter.get_document_by_objectid_api(
+        value = document_getter.get_document_by_objectid(
             args, user_dict, mongo_collection
         )
     except Exception as e:
-        msg = f"ERROR: from /get_document_by_objectid_api: {e}"
+        msg = f"ERROR: from /get_document_by_objectid: {e}"
         util.log_email(msg, error=True)
         return msg
 

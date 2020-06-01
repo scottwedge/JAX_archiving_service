@@ -112,7 +112,9 @@ print(response.json())
 ### /retrieve
 [back to top][endpoints]
 
-This endpoint will be used by the [archive frontend][frontend] or programatically by users with an `api_key` in order to retrieve archived (tier 3) files. This endpoint will accept a valid `POST` retrieve request as described below. The successful return will be an integer corresponding to the number of directories submitted for retrieval.
+This endpoint will be used by the [archive frontend][frontend] or programatically by users with an `api_key` in order to retrieve archived (tier 3) files. This endpoint will accept a valid `POST` retrieve request as described below. The successful return will be a string informing the user how many of the requested dirs were successfully submitted to pbs.
+
+Example successful return string: `4 out of 4 retrieval requests successfully submitted.`
 
 An unsuccessful return value will be a string (starting with `ERROR:`) describing why the request was not submitted to pbs.
 
