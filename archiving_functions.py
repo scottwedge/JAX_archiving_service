@@ -7,8 +7,9 @@ from pathlib import Path
 from typing import Optional
 
 
+from document_getter import get_document_by_objectid_1
 from mongo_utils import mongo_set, mongo_set_unset, mongo_delete_doc, mongo_ingest
-from util import get_timestamp, log_email, send_email
+from util import add_current_user, get_timestamp, log_email, send_email
 
 
 def build_archived_path_faculty(pi, submitter, project):
@@ -273,6 +274,13 @@ def is_valid_for_pbs(archivedPath, collection):
     return False
 
 
+def permitted_groups(user: dict, metadata: dict):
+    system_groups = metadata.get("system_groups")
+    user_groups = user.get("groups_list")
+    intersect = user_groups.intersection(system_groups)
+    return intersect if len(intersect) > 0 else None
+
+
 def submit_to_pbs(
     source: str, dest: str, action: str, group: str = None, obj_id: str = None
 ):
@@ -454,3 +462,78 @@ def archive_directory(json_arg, api_user, collection, debug: bool = False) -> No
 
     except Exception as e:  # noqa: e722
         return f"Failed to send to queue with error: {e}", 400
+
+
+def retrieve_archived_directory(
+    *, json_arg, api_user, collection, debug: bool = False
+) -> None:
+    """
+    :description: Retrieve a number of items from the archive.
+
+    :param json_args: A decoded JSON string which it at its top level a
+    dictionary.  Must have the following keys: requested_dirs, and
+    api_key. The delivery path is inferred.
+
+    :param debug: Cause a dry-run of submitting to pbs; the request will be
+    ignored.
+    """
+    log_email(
+        f"{api_user['fname']} ({api_user['username']}) retrieving: {json_arg['requested_dirs']}"
+    )
+    try:
+        if "debug" in json_arg.keys():
+            debug = json_arg["debug"]
+        number_submitted = 0
+        # [obj_id1, obj_id2]
+        for obj_id in json_arg["requested_dirs"]:
+            if not add_current_user(api_user, obj_id, collection):
+                raise Exception(f"Could not add {api_user} to metadata for {obj_id}")
+            metadata = get_document_by_objectid_1(obj_id, api_user, collection)
+            source_path = metadata["archivedPath"]
+            destination_path = f"/fastscratch/recovered{source_path}"
+            system_groups = metadata.get("system_groups")
+            if not system_groups:
+                raise Exception(f"Error getting 'system_groups' for obj_id '{obj_id}'")
+            intersect = permitted_groups(api_user, metadata)
+            if not intersect:
+                log_email(
+                    f"user {api_user['username']} does not have permission to retrieve {obj_id}"
+                )
+                continue
+            if not debug:
+                job_id = submit_to_pbs(
+                    source_path, destination_path, "retrieve", intersect[0], obj_id
+                )
+                if "retrievals" not in metadata.keys():
+                    metadata["retrievals"] = []
+                retrievals = metadata["retrievals"]
+                if job_id:
+                    next_retrieval = {
+                        "job_id": job_id,
+                        "retrieval_status": "submitted",
+                        "when_retrieval_submitted": get_timestamp(),
+                    }
+                    number_submitted += 1
+                else:
+                    next_retrieval = {
+                        "job_id": None,
+                        "retrieval_status": "failed",
+                        "when_retrieval_failed": get_timestamp(),
+                    }
+                    log_email(f"Error submitting to pbs for {obj_id}", True)
+                retrievals.append(next_retrieval)
+                mongo_set(
+                    "archivedPath", source_path, {"retrievals": retrievals}, collection
+                )
+            else:
+                return f"Dry run request to retrieve {obj_id}. No submission to pbs."
+
+        return_msg = f"{number_submitted} out of {len(json_arg['requested_dirs'])}"
+        +" retrieval requests successfully submitted."
+        log_email(return_msg)
+        return return_msg
+
+    except Exception as e:
+        err_msg = f"Error processing retrieval request: {e}"
+        log_email(err_msg)
+        return err_msg

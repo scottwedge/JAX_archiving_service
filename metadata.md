@@ -384,14 +384,6 @@ Example of metadata when request ready for submission to pbs
         "when_archival_started": "2019-12-31 22:44:08 EDT-0400",
         "when_archival_completed": "2020-01-01 03:01:59 EDT-0400"
     },
-    "retrievals": [{
-    "retrieval_status": "ready_for_pbs",
-    "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
-    "when_submitted_to_pbs": null,
-    "when_retrieval_queued": null,
-    "when_retrieval_started": null,
-    "when_retrieval_completed": null
-	}]
 }
 ```
 
@@ -445,8 +437,8 @@ Example of metadata when request ready for submission to pbs
         "when_archival_completed": "2020-01-01 03:01:59 EDT-0400"
     },
     "retrievals": [{
-    "retrieval_status": "ready_for_pbs",
-    "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
+    "job_id": "8649.ctarchive.jax.org",
+    "retrieval_status": "submitted",
     "when_submitted_to_pbs": "2020-01-02 07:34:39 EDT-0400",
     "when_retrieval_queued": null,
     "when_retrieval_started": null,
@@ -505,7 +497,6 @@ Example of metadata after request successfully queued
     "retrievals": [{
     "job_id": "8649.ctarchive.jax.org",
     "retrieval_status": "queued",
-    "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
     "when_submitted_to_pbs": "2020-01-02 07:34:39 EDT-0400",
     "when_retrieval_queued": "2020-01-02 07:34:40 EDT-0400",
     "when_retrieval_started": null,
@@ -564,7 +555,6 @@ Example of metadata after job begins processing
     "retrievals": [{
     "job_id": "8649.ctarchive.jax.org",
     "retrieval_status": "processing",
-    "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
     "when_submitted_to_pbs": "2020-01-02 07:34:39 EDT-0400",
     "when_retrieval_queued": "2020-01-02 07:34:40 EDT-0400",
     "when_retrieval_started": "2020-01-02 07:36:25 EDT-0400",
@@ -617,7 +607,6 @@ Example of metadata after retrieve job completes
     "retrievals": [{
     "job_id": "8649.ctarchive.jax.org",
     "retrieval_status": "completed",
-    "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
     "when_submitted_to_pbs": "2020-01-02 07:34:39 EDT-0400",
     "when_retrieval_queued": "2020-01-02 07:34:40 EDT-0400",
     "when_retrieval_started": "2020-01-02 07:36:25 EDT-0400",
@@ -670,7 +659,6 @@ Example of metadata when retrieval fails
     "retrievals": [{
     "job_id": "8649.ctarchive.jax.org",
     "retrieval_status": "failed",
-    "when_ready_for_pbs": "2020-01-02 07:34:38 EDT-0400",
     "when_submitted_to_pbs": "2020-01-02 07:34:39 EDT-0400",
     "when_retrieval_queued": "2020-01-02 07:34:40 EDT-0400",
     "when_retrieval_started": "2020-03-30 12:32:15 EDT-0400",
